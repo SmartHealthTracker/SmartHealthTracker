@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models;
+use App\Models\Participation;
 use App\Models\Challenge;
 use App\Models\User;
 

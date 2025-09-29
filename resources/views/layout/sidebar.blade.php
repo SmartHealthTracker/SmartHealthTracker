@@ -39,12 +39,6 @@
         </button>
       </div>
     </li>
-    <li class="nav-item {{ active_class(['/']) }}">
-      <a class="nav-link" href="{{ url('/') }}">
-        <i class="menu-icon mdi mdi-television"></i>
-        <span class="menu-title">Dashboard</span>
-      </a>
-    </li>
     {{-- Lien vers les utilisateurs --}}
     <li class="nav-item {{ active_class(['admin/users']) }}">
       <a class="nav-link" href="{{ url('/admin/users') }}">
@@ -52,32 +46,12 @@
         <span class="menu-title">Utilisateurs</span>
       </a>
     </li>
-    <li class="nav-item {{ active_class(['/participations']) }}">
-      <a class="nav-link" href="{{ url('/participations') }}">
-          <i class="menu-icon mdi mdi-account-multiple"></i>
-          <span class="menu-title">Participations</span>
-      </a>  
+    <li class="nav-item {{ active_class(['/']) }}">
+      <a class="nav-link" href="{{ url('/') }}">
+        <i class="menu-icon mdi mdi-television"></i>
+        <span class="menu-title">Dashboard</span>
+      </a>
     </li>
-    <li class="nav-item {{ active_class(['/challenges']) }}">
-      <a class="nav-link" href="{{ url('/challenges') }}">
-          <i class="menu-icon mdi mdi-account-multiple"></i>
-          <span class="menu-title">Challenges</span>
-      </a>  
-    </li>
-    <li class="nav-item {{ active_class(['/admin/resources']) }}">
-      <a class="nav-link" href="{{ url('/admin/resources') }}">
-          <i class="menu-icon mdi mdi-account-multiple"></i>
-          <span class="menu-title">Resources</span>
-      </a>  
-    </li>
-    <li class="nav-item {{ active_class(['/admin/comments']) }}">
-      <a class="nav-link" href="{{ url('/admin/comments') }}">
-          <i class="menu-icon mdi mdi-account-multiple"></i>
-          <span class="menu-title">Comments</span>
-      </a>  
-    </li>
-
-    
     <li class="nav-item {{ active_class(['basic-ui/*']) }}">
       <a class="nav-link" data-toggle="collapse" href="#basic-ui" aria-expanded="{{ is_active_route(['basic-ui/*']) }}" aria-controls="basic-ui">
         <i class="menu-icon mdi mdi-dna"></i>
