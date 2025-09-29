@@ -7,11 +7,22 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\ChallengeController;
 use App\Http\Controllers\ParticipationController;
+use App\Http\Controllers\UserControllerr;
+use App\Http\Controllers\ActivityController;
+use App\Http\Controllers\ActivityLogController;
 
 
 Route::get('/', function () {
     return view('dashboard');
 });
+Route::resource('activities', ActivityController::class)
+    ->names('activities')
+    ->except('show');
+
+Route::resource('activity-logs', ActivityLogController::class)
+    ->names('activity_logs')
+    ->except('show');
+
 Route::resource('challenges', ChallengeController::class);
 Route::resource('participations', ParticipationController::class);
 
@@ -111,6 +122,10 @@ Route::group(['prefix' => 'user-pages'], function() {
     Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
     Route::post('login', [LoginController::class, 'login'])->name('login.post');
     Route::post('logout', [LoginController::class, 'logout'])->name('logout');
+    Route::get('deleteusers', [UserControllerr::class, 'index'])->name('users.index');
+    Route::delete('deleteusers/{user}', [UserControllerr::class, 'destroy'])->name('users.destroy');
+    Route::post('deleteusers/delete-all', [UserControllerr::class, 'deleteAll'])->name('users.deleteAll');
+    Route::patch('toggle-block/{user}', [UserControllerr::class, 'toggleBlock'])->name('users.toggleBlock');
 
     Route::get('login-2', function () { return view('pages.user-pages.login-2'); });
     Route::get('multi-step-login', function () { return view('pages.user-pages.multi-step-login'); });

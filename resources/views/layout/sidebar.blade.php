@@ -146,9 +146,40 @@
           <li class="nav-item {{ active_class(['user-pages/lock-screen']) }}">
             <a class="nav-link" href="{{ url('/user-pages/lock-screen') }}">Lock Screen</a>
           </li>
+          <li class="nav-item {{ active_class(['user-pages/deleteusers']) }}">
+            <a class="nav-link" href="{{ url('/user-pages/deleteusers') }}"> Users</a>
+          </li>
         </ul>
       </div>
     </li>
+    <li class="nav-item {{ active_class(['activities/*']) }}">
+      <a class="nav-link" data-toggle="collapse" href="#activities" aria-expanded="{{ is_active_route(['activities/*']) }}" aria-controls="activities">
+        <i class="menu-icon mdi mdi-dna"></i>
+        <span class="menu-title">Activities</span>
+        <i class="menu-arrow"></i>
+      </a>
+      <div class="collapse {{ show_class(['activities/*']) }}" id="activities">
+        <ul class="nav flex-column sub-menu">
+          <li class="nav-item {{ active_class(['activities']) }}">
+            <a class="nav-link" href="{{ route('activities.index') }}">Activities</a>
+          </li>
+        </ul>
+      </div>
+    </li>  
+    <li class="nav-item {{ active_class(['activity-logs/*']) }}">
+  <a class="nav-link" data-toggle="collapse" href="#activity-logs" aria-expanded="{{ is_active_route(['activity-logs/*']) }}" aria-controls="activity-logs">
+    <i class="menu-icon mdi mdi-notebook"></i>
+    <span class="menu-title">Activity Logs</span>
+    <i class="menu-arrow"></i>
+  </a>
+  <div class="collapse {{ show_class(['activity-logs/*']) }}" id="activity-logs">
+    <ul class="nav flex-column sub-menu">
+      <li class="nav-item {{ active_class(['activity-logs']) }}">
+        <a class="nav-link" href="{{ route('activity_logs.index') }}">Activity Logs</a>
+      </li>
+    </ul>
+  </div>
+</li>
     <li class="nav-item">
       <a class="nav-link" href="https://www.bootstrapdash.com/demo/star-laravel-free/documentation/documentation.html" target="_blank">
         <i class="menu-icon mdi mdi-file-outline"></i>
