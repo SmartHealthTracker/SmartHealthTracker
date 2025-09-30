@@ -4,19 +4,19 @@
 @section('content')
 <div class="row">
   <div class="col-12 col-md-8 offset-md-2">
-    <div class="card shadow-lg border-0 rounded-4">
-      <div class="card-header bg-dark text-white rounded-top-4">
+    <div class="card shadow-sm border-0 rounded-4">
+      <div class="card-header bg-light text-dark rounded-top-4">
         <h4 class="mb-0">Ajouter un Journal d’Activité</h4>
       </div>
       <div class="card-body p-4">
-
         <form action="{{ route('activity_logs.store') }}" method="POST" novalidate>
           @csrf
 
           {{-- Activité --}}
-          <div class="form-group mb-3">
-            <label for="activity_id" class="fw-bold">Activité</label>
-            <select name="activity_id" id="activity_id" class="form-control @error('activity_id') is-invalid @enderror" required>
+          <div class="mb-3">
+            <label for="activity_id" class="form-label fw-bold">Activité</label>
+            <select name="activity_id" id="activity_id" 
+                    class="form-select rounded-3 shadow-sm @error('activity_id') is-invalid @enderror" required>
               <option value="">-- Sélectionnez une activité --</option>
               @foreach($activities as $activity)
                 <option value="{{ $activity->id }}" {{ old('activity_id') == $activity->id ? 'selected' : '' }}>
@@ -30,9 +30,10 @@
           </div>
 
           {{-- Utilisateur --}}
-          <div class="form-group mb-3">
-            <label for="user_id" class="fw-bold">Utilisateur</label>
-            <select name="user_id" id="user_id" class="form-control @error('user_id') is-invalid @enderror" required>
+          <div class="mb-3">
+            <label for="user_id" class="form-label fw-bold">Utilisateur</label>
+            <select name="user_id" id="user_id" 
+                    class="form-select rounded-3 shadow-sm @error('user_id') is-invalid @enderror" required>
               <option value="">-- Sélectionnez un utilisateur --</option>
               @foreach($users as $user)
                 <option value="{{ $user->id }}" {{ old('user_id') == $user->id ? 'selected' : '' }}>
@@ -46,10 +47,10 @@
           </div>
 
           {{-- Durée --}}
-          <div class="form-group mb-3">
-            <label for="duration" class="fw-bold">Durée (minutes)</label>
+          <div class="mb-3">
+            <label for="duration" class="form-label fw-bold">Durée (minutes)</label>
             <input type="number" name="duration" id="duration" 
-                   class="form-control @error('duration') is-invalid @enderror"
+                   class="form-control rounded-3 shadow-sm @error('duration') is-invalid @enderror"
                    value="{{ old('duration') }}" required min="1" max="1440">
             @error('duration')
               <div class="invalid-feedback">{{ $message }}</div>
@@ -57,17 +58,24 @@
           </div>
 
           {{-- Date --}}
-          <div class="form-group mb-3">
-            <label for="date" class="fw-bold">Date</label>
+          <div class="mb-3">
+            <label for="date" class="form-label fw-bold">Date</label>
             <input type="date" name="date" id="date" 
-                   class="form-control @error('date') is-invalid @enderror"
+                   class="form-control rounded-3 shadow-sm @error('date') is-invalid @enderror"
                    value="{{ old('date') }}" required>
             @error('date')
               <div class="invalid-feedback">{{ $message }}</div>
             @enderror
           </div>
 
-          <button type="submit" class="btn btn-primary w-100 fw-bold">Enregistrer</button>
+          <div class="d-flex justify-content-between mt-4">
+            <a href="{{ route('activity_logs.index') }}" class="btn btn-secondary fw-bold px-4 rounded-3">
+              Annuler
+            </a>
+            <button type="submit" class="btn btn-primary fw-bold px-4 rounded-3">
+              Enregistrer
+            </button>
+          </div>
         </form>
       </div>
     </div>
