@@ -1,4 +1,5 @@
 <?php
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
@@ -7,7 +8,12 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\ChallengeController;
 use App\Http\Controllers\ParticipationController;
-
+use App\Http\Controllers\HabitController;
+use App\Http\Controllers\HabitTrackingController;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\View;
+use App\Http\Controllers\NutritionController;
+use App\Http\Controllers\HealthController;
 
 Route::get('/', function () {
     return view('dashboard');
@@ -164,9 +170,36 @@ Route::get('/clear-cache', function() {
     Artisan::call('cache:clear');
     return "Cache is cleared";
 });
+// Habits Routes
+Route::resource('habits', HabitController::class);
+Route::post('/habits/{habit}/start', [HabitController::class, 'start'])->name('habits.start');
+
+Route::post('/habit-trackings/{tracking}/update', [HabitTrackingController::class, 'updateProgress'])->name('habit.updateProgress');
+Route::post('/habit-trackings/{tracking}/finish', [HabitTrackingController::class, 'finish'])->name('habit.finish');
+
+Route::post('/nutrition', [NutritionController::class, 'getNutrition'])->name('nutrition.get');
+
+// routes/web.php
+
+Route::prefix('health')->middleware(['auth'])->group(function () {
+    // Page principale du Health Tracker (affiche le formulaire et l'historique)
+    Route::get('/', [HealthController::class, 'index'])->name('health.index');
+
+    // Page des logs (pour route('health.logs'))
+    Route::get('/logs', [HealthController::class, 'logs'])->name('health.logs');
+
+    // CRUD HealthTracker (ajout d'un log)
+    Route::post('/', [HealthController::class, 'store'])->name('health.store');
+
+    // Suppression d'un log
+    Route::delete('/{healthLog}', [HealthController::class, 'destroy'])->name('health.destroy');
+});
+
 
 // 404 for undefined routes
 Route::any('/{page?}',function(){
     return View::make('pages.error-pages.error-404');
 })->where('page','.*');
-
+Route::any('/{page?}',function(){
+    return View::make('pages.error-pages.error-404');
+})->where('page','.*');
