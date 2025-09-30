@@ -100,6 +100,9 @@
         <div class="form-group">
             <label for="ingredients">Entrez les ingrédients (séparés par des virgules) :</label>
             <input type="text" id="ingredients" class="form-control" placeholder="Ex: pomme, riz, poulet">
+            <div id="ingredients-feedback" class="invalid-feedback" style="display:none;">
+                Veuillez entrer au moins un ingrédient.
+            </div>
         </div>
         <button id="check-nutrition" class="btn btn-primary mt-2">Vérifier Nutrition</button>
 
@@ -200,39 +203,53 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Nutrition button
     document.getElementById('check-nutrition').addEventListener('click', async function() {
-        const ingredientsInput = document.getElementById('ingredients').value.trim();
+        const ingredientsInput = document.getElementById('ingredients');
         const resultDiv = document.getElementById('nutrition-result');
         const nutritionList = document.getElementById('nutrition-list');
+        const feedback = document.getElementById('ingredients-feedback');
 
-        if (!ingredientsInput) {
-            Swal.fire('Erreur', 'Veuillez entrer au moins un ingrédient.', 'error');
+        if (!ingredientsInput.value.trim()) {
+            ingredientsInput.classList.add('is-invalid');
+            feedback.style.display = 'block';
+            ingredientsInput.focus();
             return;
+        } else {
+            ingredientsInput.classList.remove('is-invalid');
+            feedback.style.display = 'none';
         }
 
-        const ingredients = ingredientsInput.split(',').map(i => i.trim());
+        const ingredients = ingredientsInput.value.trim().split(',').map(i => i.trim());
         nutritionList.innerHTML = '';
         resultDiv.style.display = 'block';
 
         for (let ingredient of ingredients) {
             try {
-                const response = await fetch("{{ route('nutrition.get') }}", {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ ingredient })
-                });
+                // Appel direct à l'API OpenFoodFacts (pas à la route Laravel)
+                const response = await fetch(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(ingredient)}&search_simple=1&action=process&json=1`);
                 const data = await response.json();
 
-                if (data.error) {
-                    nutritionList.innerHTML += `<li><strong>${ingredient}</strong> - ${data.error}</li>`;
+                if (data.products && data.products.length > 0) {
+                    const product = data.products[0];
+                    const calories = product.nutriments['energy-kcal_100g'] ?? 'N/A';
+                    const protein = product.nutriments['proteins_100g'] ?? 'N/A';
+                    const carbs = product.nutriments['carbohydrates_100g'] ?? 'N/A';
+                    const fat = product.nutriments['fat_100g'] ?? 'N/A';
+
+                    nutritionList.innerHTML += `<li><strong>${ingredient}</strong> - Calories: ${calories} kcal, Protéines: ${protein} g, Glucides: ${carbs} g, Lipides: ${fat} g</li>`;
                 } else {
-                    nutritionList.innerHTML += `<li><strong>${ingredient}</strong> - Calories: ${data.calories} kcal, Protéines: ${data.protein} g, Glucides: ${data.carbs} g, Lipides: ${data.fat} g</li>`;
+                    nutritionList.innerHTML += `<li><strong>${ingredient}</strong> - Aucun résultat trouvé</li>`;
                 }
             } catch (error) {
                 nutritionList.innerHTML += `<li><strong>${ingredient}</strong> - Erreur serveur</li>`;
             }
+        }
+    });
+
+    // Optionnel : retirer l'erreur dès que l'utilisateur saisit quelque chose
+    document.getElementById('ingredients').addEventListener('input', function() {
+        if (this.value.trim()) {
+            this.classList.remove('is-invalid');
+            document.getElementById('ingredients-feedback').style.display = 'none';
         }
     });
 

@@ -1,6 +1,7 @@
 @extends('layout.master')
 
 @push('plugin-styles')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 @endpush
 
 @section('content')
@@ -11,66 +12,51 @@
     <div class="card">
       <div class="card-body">
         <h4 class="card-title">Ajouter un log santé</h4>
-        <form action="{{ route('health.store') }}" method="POST">
+        <form action="{{ route('health.store') }}" method="POST" novalidate>
           @csrf
-          <div class="form-row">
-            <div class="form-group col-md-3">
-              <label for="weight">Poids (kg)</label>
-              <input type="number" step="0.1" name="weight" class="form-control">
+          <div class="row">
+            <div class="col-md-2">
+              <input type="number" name="water" class="form-control" placeholder="Eau (ml)" value="{{ old('water') }}">
             </div>
-            <div class="form-group col-md-3">
-              <label for="height">Taille (cm)</label>
-              <input type="number" name="height" class="form-control">
+            <div class="col-md-2">
+              <input type="number" step="0.1" name="weight" class="form-control" placeholder="Poids (kg)" value="{{ old('weight') }}">
             </div>
-            <div class="form-group col-md-3">
-              <label for="water">Eau (ml)</label>
-              <input type="number" name="water" class="form-control">
+            <div class="col-md-2">
+              <input type="number" step="0.1" name="height" class="form-control" placeholder="Taille (cm)" value="{{ old('height') }}">
             </div>
-            <div class="form-group col-md-3">
-              <label for="steps">Nombre de pas</label>
-              <input type="number" name="steps" class="form-control">
+            <div class="col-md-2">
+              <input type="number" name="steps" class="form-control" placeholder="Pas" value="{{ old('steps') }}">
             </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group col-md-3">
-              <label for="food_name">Aliment</label>
-              <input type="text" name="food_name" class="form-control">
+            <div class="col-md-2">
+              <input type="text" name="food_name" class="form-control" placeholder="Aliment" value="{{ old('food_name') }}">
             </div>
-            <div class="form-group col-md-2">
-              <label for="calories">Calories</label>
-              <input type="number" name="calories" class="form-control">
+            <div class="col-md-1">
+              <input type="number" name="calories" class="form-control" placeholder="Cal" value="{{ old('calories') }}">
             </div>
-            <div class="form-group col-md-2">
-              <label for="protein">Protéines (g)</label>
-              <input type="number" name="protein" class="form-control">
+            <div class="col-md-1">
+              <input type="number" name="protein" class="form-control" placeholder="Prot" value="{{ old('protein') }}">
             </div>
-            <div class="form-group col-md-2">
-              <label for="carbs">Glucides (g)</label>
-              <input type="number" name="carbs" class="form-control">
+            <div class="col-md-1">
+              <input type="number" name="carbs" class="form-control" placeholder="Carb" value="{{ old('carbs') }}">
             </div>
-            <div class="form-group col-md-2">
-              <label for="fat">Lipides (g)</label>
-              <input type="number" name="fat" class="form-control">
+            <div class="col-md-1">
+              <input type="number" name="fat" class="form-control" placeholder="Fat" value="{{ old('fat') }}">
             </div>
           </div>
 
-          <div class="form-row">
-            <div class="form-group col-md-3">
-              <label for="sleep_hours">Heures de sommeil</label>
-              <input type="number" step="0.1" name="sleep_hours" class="form-control">
+          <div class="row mt-2">
+            <div class="col-md-2">
+              <input type="number" name="sleep_hours" class="form-control" placeholder="Sommeil (h)" value="{{ old('sleep_hours') }}">
             </div>
-            <div class="form-group col-md-3">
-              <label for="heart_rate">Fréquence cardiaque</label>
-              <input type="number" name="heart_rate" class="form-control">
+            <div class="col-md-2">
+              <input type="number" name="heart_rate" class="form-control" placeholder="FC (bpm)" value="{{ old('heart_rate') }}">
             </div>
-            <div class="form-group col-md-3">
-              <label for="blood_pressure">Tension (ex: 120/80)</label>
-              <input type="text" name="blood_pressure" class="form-control">
+            <div class="col-md-2">
+              <input type="text" name="blood_pressure" class="form-control" placeholder="TA (120/80)" value="{{ old('blood_pressure') }}">
             </div>
           </div>
 
-          <button type="submit" class="btn btn-success mt-2">Ajouter</button>
+          <button type="submit" class="btn btn-primary mt-2">Ajouter</button>
         </form>
       </div>
     </div>
@@ -121,7 +107,7 @@
                   <form action="{{ route('health.destroy', $log->id) }}" method="POST">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
+                    <button type="submit" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i> Supprimer</button>
                   </form>
                 </td>
               </tr>
@@ -165,12 +151,43 @@
 @endsection
 
 @push('plugin-scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="{{ asset('assets/plugins/chartjs/chart.min.js') }}"></script>
 @endpush
 
 @push('custom-scripts')
 <script>
 const logs = @json($logs);
+
+// Popups pour erreurs et succès
+@if ($errors->any())
+let errors = @json($errors->all());
+errors.forEach(err => {
+    Swal.fire({
+        icon: 'error',
+        title: 'Erreur de saisie',
+        text: err,
+        toast: true,
+        position: 'top-end',
+        timer: 4000,
+        timerProgressBar: true,
+        showConfirmButton: false
+    });
+});
+@endif
+
+@if (session('success'))
+Swal.fire({
+    icon: 'success',
+    title: 'Succès',
+    text: '{{ session('success') }}',
+    toast: true,
+    position: 'top-end',
+    timer: 3000,
+    timerProgressBar: true,
+    showConfirmButton: false
+});
+@endif
 
 // Bar Chart : Calories et macronutriments
 const barCtx = document.getElementById('barChart').getContext('2d');
