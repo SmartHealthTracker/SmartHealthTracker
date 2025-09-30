@@ -6,9 +6,11 @@
     "type": "project",
     "require": {
         "php": "^8.2",
+        "doctrine/dbal": "^4.3",
         "laravel/framework": "^12.0",
         "laravel/socialite": "^5.23",
         "laravel/tinker": "^3.2",
+        "nesbot/carbon": "^3.10",
         "spatie/laravel-html": "*"
     },
     "require-dev": {
