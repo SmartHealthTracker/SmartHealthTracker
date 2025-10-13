@@ -11,13 +11,38 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\ResourceController;
 use App\Models\Resource;
+use Illuminate\Support\Facades\Auth;
+
 
 Route::post('/admin/resources/{resource}/comment', [ResourceController::class, 'comment'])->name('resources.comment');
 
 Route::get('/home', function () {
     $resources = Resource::with('comments')->orderBy('created_at', 'desc')->get();
-    return view('home', compact('resources'));
+
+    $recommendedResources = collect();
+
+    if(Auth::check()) {
+        $currentUserId = Auth::id();
+
+        $seenIds = \DB::table('user_resources')
+                      ->where('user_id', $currentUserId)
+                      ->pluck('resource_id')
+                      ->toArray();
+
+        $recommendedResources = Resource::whereNotIn('id', $seenIds)
+                                        ->limit(5)
+                                        ->get();
+
+        if ($recommendedResources->isEmpty()) {
+            $recommendedResources = Resource::latest()->limit(5)->get();
+        }
+    }
+
+    return view('home', compact('resources', 'recommendedResources'));
 });
+
+
+
 
 
 
@@ -46,6 +71,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::get('/settings', [ProfileController::class, 'settings'])->name('settings');
+
+
+
+     // 🔹 Nouvelle route pour enregistrer une vue de ressource
+    Route::post('/resource/view/{resource}', [App\Http\Controllers\Admin\ResourceController::class, 'recordView'])
+        ->name('resources.recordView');
 });
 
 // ---------------------- GOOGLE AUTH ----------------------

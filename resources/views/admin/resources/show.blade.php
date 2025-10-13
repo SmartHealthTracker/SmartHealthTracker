@@ -17,5 +17,28 @@
         <button class="btn btn-danger" onclick="return confirm('Êtes-vous sûr ?')">Supprimer</button>
     </form>
     <a href="{{ route('resources.index') }}" class="btn btn-secondary">Retour à la liste</a>
+
+    {{-- 🔹 Recommandations --}}
+    @if($recommended->isNotEmpty())
+        <hr>
+        <h3>Ressources recommandées :</h3>
+        <div class="row">
+            @foreach($recommended as $rec)
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <img src="{{ asset('storage/images/' . ($rec->image ?? 'default-resource.jpg')) }}" 
+                             class="card-img-top" 
+                             style="height:200px; object-fit:cover;" 
+                             alt="{{ $rec->title }}">
+                        <div class="card-body">
+                            <h6>{{ $rec->title }}</h6>
+                            <p>{{ Str::limit($rec->content, 80) }}</p>
+                            <a href="{{ route('resources.show', $rec->id) }}" class="btn btn-sm btn-primary">Voir</a>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    @endif
 </div>
 @endsection

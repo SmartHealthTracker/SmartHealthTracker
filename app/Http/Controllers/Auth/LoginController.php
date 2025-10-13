@@ -38,9 +38,9 @@ class LoginController extends Controller
 
         // 🔹 Redirection selon le rôle
         if ($user->role === 'admin') {
-            return redirect('/home'); // admin → dashboard
+            return redirect('/'); // admin → dashboard
         } else {
-            return redirect('/'); // user → home
+            return redirect('/home'); // user → home
         }
     }
 

@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller; // ✅ Ajouter cette ligne
 use App\Models\Resource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\UserResource;
+
 
 class ResourceController extends Controller
 {
@@ -51,11 +53,17 @@ class ResourceController extends Controller
 
 
     public function show(Resource $resource)
-    {
-        // Charger les commentaires et l'utilisateur
-        $resource->load('comments.user', 'user');
-        return view('admin.resources.show', compact('resource'));
-    }
+{
+    // Charger les commentaires et l'utilisateur
+    $resource->load('comments.user', 'user');
+
+    // Charger les recommandations
+    $recommended = $resource->recommendedResources();
+
+    // 🔹 Passer aussi $recommended à la vue
+    return view('admin.resources.show', compact('resource', 'recommended'));
+}
+
 
     public function edit(Resource $resource)
     {
@@ -93,5 +101,17 @@ class ResourceController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Commentaire ajouté avec succès !');
+    }
+
+    public function recordView(Resource $resource)
+    {
+        // Enregistre la vue si elle n'existe pas déjà pour cet utilisateur et cette ressource
+        UserResource::firstOrCreate([
+            'user_id' => auth()->id(),
+            'resource_id' => $resource->id,
+            'action' => 'view'
+        ]);
+
+        return response()->json(['success' => true]);
     }
 }
