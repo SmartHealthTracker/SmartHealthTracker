@@ -11,15 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('activity_logs', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('activity_id')->constrained()->onDelete('cascade');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->integer('duration');
-            $table->integer('calories_burned');
-            $table->date('date');
-            $table->timestamps();
-        });
+        // Avant de créer la table, vérifiez si elle existe déjà
+        if (!Schema::hasTable('activity_logs')) {
+            Schema::create('activity_logs', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('activity_id');
+                $table->unsignedBigInteger('user_id');
+                $table->integer('duration');
+                $table->integer('calories_burned');
+                $table->date('date');
+                $table->timestamps();
+            });
+        }
     }
 
     /**

@@ -12,7 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-             $table->boolean('is_blocked')->default(false)->after('password');
+            // Ajout seulement si la colonne n'existe pas déjà
+            if (!Schema::hasColumn('users', 'is_blocked')) {
+                $table->boolean('is_blocked')->default(false)->after('password');
+            }
         });
     }
 
@@ -22,7 +25,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-             $table->dropColumn('is_blocked');
+            if (Schema::hasColumn('users', 'is_blocked')) {
+                $table->dropColumn('is_blocked');
+            }
         });
     }
 };

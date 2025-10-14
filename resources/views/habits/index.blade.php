@@ -23,11 +23,13 @@
                             $tracking = $habit->trackings->sortByDesc('date')->first();
                             $progress = 0;
                             $state = 'not_started';
+                            $startedAt = null;
                             if ($tracking) {
                                 $state = $tracking->state;
                                 if ($state === 'in_progress' && $habit->duration && $tracking->started_at) {
                                     $elapsed = \Carbon\Carbon::parse($tracking->started_at)->diffInMinutes(now());
                                     $progress = min(100, round(($elapsed / $habit->duration) * 100));
+                                    $startedAt = \Carbon\Carbon::parse($tracking->started_at)->timestamp;
                                 } elseif ($habit->duration && $tracking->progress) {
                                     $progress = min(100, round(($tracking->progress / $habit->duration) * 100));
                                 } else {
@@ -55,6 +57,11 @@
                                         aria-valuemin="0" aria-valuemax="100"></div>
                                 </div>
                                 <span id="progress-label-{{ $habit->id }}">{{ $progress }}%</span>
+                                <span id="timer-{{ $habit->id }}" class="badge badge-secondary ml-2"
+                                    data-started="{{ $startedAt ?? '' }}"
+                                    data-duration="{{ $habit->duration ?? '' }}"
+                                    style="display:{{ ($state === 'in_progress' && $startedAt) ? '' : 'none' }}">
+                                </span>
                             </td>
                             <td>{{ $habit->duration ?? '-' }} min</td>
                             <td>
@@ -117,30 +124,43 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     let intervals = {};
+    let timers = {};
 
-    function updateProgressBar(habitId, trackingId, duration, button, progressBar, progressLabel, resultSpan) {
-        fetch(`/habit-trackings/${trackingId}/update`, {
-            method: 'POST',
-            headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Content-Type': 'application/json'},
-            body: JSON.stringify({})
-        })
-        .then(res => res.json())
-        .then(data => {
-            let percent = Math.min(100, Math.round(data.progress));
-            progressBar.style.width = percent + '%';
-            progressLabel.textContent = percent + '%';
-            if (data.state === 'completed') {
-                clearInterval(intervals[habitId]);
-                resultSpan.textContent = 'Done';
-                button.textContent = "Completed";
-                button.classList.remove("btn-warning");
-                button.classList.add("btn-success");
-                Swal.fire('Bravo!', 'Habitude complétée!', 'success');
-            }
-        });
+    function formatTime(seconds) {
+        const h = Math.floor(seconds / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        const s = seconds % 60;
+        return (h > 0 ? (h < 10 ? '0' : '') + h + ':' : '') +
+               (m < 10 ? '0' : '') + m + ':' +
+               (s < 10 ? '0' : '') + s;
     }
 
-    // Habits buttons
+    // Chronomètre auto pour les activités déjà en cours (après refresh)
+    document.querySelectorAll('[id^="timer-"]').forEach(function(timerSpan) {
+        const habitId = timerSpan.id.replace('timer-', '');
+        const startedAt = parseInt(timerSpan.dataset.started);
+        const duration = parseInt(timerSpan.dataset.duration);
+        if (startedAt && duration) {
+            function updateTimer() {
+                const now = Math.floor(Date.now() / 1000);
+                const elapsed = now - startedAt;
+                const percent = Math.min(100, Math.round((elapsed / (duration * 60)) * 100));
+                const progressBar = document.getElementById('progress-' + habitId);
+                const progressLabel = document.getElementById('progress-label-' + habitId);
+                progressBar.style.width = percent + '%';
+                progressLabel.textContent = percent + '%';
+                timerSpan.textContent = formatTime(elapsed);
+                if (percent >= 100) {
+                    timerSpan.textContent = formatTime(duration * 60);
+                    clearInterval(timers[habitId]);
+                }
+            }
+            updateTimer();
+            timers[habitId] = setInterval(updateTimer, 1000);
+            timerSpan.style.display = '';
+        }
+    });
+
     document.querySelectorAll('.start-btn').forEach(button => {
         button.addEventListener('click', () => {
             const habitId = button.dataset.id;
@@ -148,8 +168,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const progressBar = document.getElementById('progress-' + habitId);
             const progressLabel = document.getElementById('progress-label-' + habitId);
             const resultSpan = document.getElementById('result-' + habitId);
+            const timerSpan = document.getElementById('timer-' + habitId);
 
             if (intervals[habitId]) clearInterval(intervals[habitId]);
+            if (timers[habitId]) clearInterval(timers[habitId]);
             if (!duration || duration <= 0) {
                 Swal.fire('Erreur', 'Durée non définie pour cette habitude.', 'error');
                 return;
@@ -168,11 +190,30 @@ document.addEventListener('DOMContentLoaded', function() {
                 button.classList.remove("btn-outline-primary");
                 button.classList.add("btn-warning");
 
-                updateProgressBar(habitId, trackingId, duration, button, progressBar, progressLabel, resultSpan);
+                // Récupérer le timestamp de départ pour le chronomètre
+                fetch(`/habit-trackings/${trackingId}`)
+                    .then(res => res.json())
+                    .then(trackingData => {
+                        let startedAt = trackingData.started_at
+                            ? Math.floor(new Date(trackingData.started_at).getTime() / 1000)
+                            : Math.floor(Date.now() / 1000);
 
-                intervals[habitId] = setInterval(() => {
-                    updateProgressBar(habitId, trackingId, duration, button, progressBar, progressLabel, resultSpan);
-                }, 60000);
+                        timerSpan.style.display = '';
+                        function updateTimer() {
+                            const now = Math.floor(Date.now() / 1000);
+                            const elapsed = now - startedAt;
+                            const percent = Math.min(100, Math.round((elapsed / (duration * 60)) * 100));
+                            progressBar.style.width = percent + '%';
+                            progressLabel.textContent = percent + '%';
+                            timerSpan.textContent = formatTime(elapsed);
+                            if (percent >= 100) {
+                                timerSpan.textContent = formatTime(duration * 60);
+                                clearInterval(timers[habitId]);
+                            }
+                        }
+                        updateTimer();
+                        timers[habitId] = setInterval(updateTimer, 1000);
+                    });
             });
         });
     });
@@ -255,4 +296,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
 });
 </script>
+<style>
+.badge-secondary {
+    background-color: #6c757d;
+    font-size: 0.9em;
+}
+</style>
+
 @endsection

@@ -9,17 +9,23 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
-    {
+   public function up()
+{
     Schema::create('habits', function (Blueprint $table) {
-    $table->id();
-    $table->string('name');
-    $table->text('description')->nullable();
-    $table->unsignedBigInteger('user_id'); // pour relier l'habitude à un étudiant
-    $table->timestamps();
-});
+        $table->id();
+        $table->string('name');
+        $table->string('type'); // <-- ajoute cette ligne
+        $table->integer('duration')->nullable();
+        $table->string('icon')->nullable();
+        $table->unsignedBigInteger('user_id');
+        $table->time('schedule_time')->nullable();
+        $table->text('description')->nullable();
+        $table->timestamps();
 
-    }
+        $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+    });
+}
+
 
     /**
      * Reverse the migrations.
