@@ -30,6 +30,12 @@ Route::resource('activity-logs', ActivityLogController::class)
     ->names('activity_logs')
     ->except('show');
 
+Route::get('/health-assistant', [HealthAssistantController::class, 'index'])
+    ->name('health_assistant.index');
+    
+Route::post('/health-assistant/chat', [HealthAssistantController::class, 'chat'])
+    ->name('health_assistant.chat');
+
 Route::resource('challenges', ChallengeController::class);
 Route::resource('participations', ParticipationController::class);
 
