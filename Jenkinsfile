@@ -18,25 +18,20 @@ pipeline {
 
         stage('Install dependencies') {
             steps {
-                script {
-                    // Utilisation de Docker pour exécuter Composer
-                    sh '''
-                    docker run --rm -v $PWD:/app -w /app composer install --no-interaction --prefer-dist
-                    '''
-                }
+                sh '''
+                docker run --rm -v $PWD:/app -w /app composer install --no-interaction --prefer-dist
+                '''
             }
         }
 
         stage('Run Unit Tests') {
             steps {
-                script {
-                    // Exécuter PHPUnit dans un container PHP
-                    sh '''
-                    docker run --rm -v $PWD:/app -w /app php:8.2-cli bash -c "composer install --no-interaction --prefer-dist && vendor/bin/phpunit"
-                    '''
-                }
+                sh '''
+                docker run --rm -v $PWD:/app -w /app composer bash -c "vendor/bin/phpunit"
+                '''
             }
         }
+
 
         stage('SonarQube Analysis') {
             steps {
