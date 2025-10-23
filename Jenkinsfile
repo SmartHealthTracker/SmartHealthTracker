@@ -55,7 +55,7 @@ pipeline {
                         ${scannerHome}/bin/sonar-scanner \
                         -Dsonar.projectKey=${APP_NAME} \
                         -Dsonar.sources=. \
-                        -Dsonar.exclusions=public/assets/plugins/**/*.js
+                        -Dsonar.exclusions=public/assets/plugins/**/*.js,vendor/**,node_modules/**,storage/**
                         """
                     }
                 }
