@@ -34,7 +34,7 @@ use App\Http\Controllers\HabitLogController;
 
 
 Route::get('/', function () {
-    return view('dashboard');
+    return view('home.blade.php');
 });
 
 
