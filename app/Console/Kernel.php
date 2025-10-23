@@ -24,8 +24,11 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')
-        //          ->hourly();
+        // ✅ Vérifier les habits complétés toutes les minutes
+        $schedule->command('habits:check-completed')
+            ->everyMinute()
+            ->withoutOverlapping()
+            ->appendOutputTo(storage_path('logs/scheduler.log'));
     }
 
     /**
@@ -40,3 +43,4 @@ class Kernel extends ConsoleKernel
         require base_path('routes/console.php');
     }
 }
+

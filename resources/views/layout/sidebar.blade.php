@@ -83,13 +83,32 @@
             <li class="nav-item {{ active_class(['habits']) }}">
                 <a class="nav-link" href="{{ route('habits.index') }}">Liste des Habits</a>
             </li>
+            <li class="nav-item {{ active_class(['objectives*']) }}">
+                <a class="nav-link" href="{{ route('objectives.index') }}">Objectives Calendar</a>
+            </li>
             <li class="nav-item {{ active_class(['habits/create']) }}">
                 <a class="nav-link" href="{{ route('habits.create') }}">Ajouter un Habit</a>
             </li>
         </ul>
     </div>
     </li>
-   
+
+
+
+
+    <li class="nav-item {{ active_class(['/participations']) }}">
+      <a class="nav-link" href="{{ url('/participations') }}">
+          <i class="menu-icon mdi mdi-account-multiple"></i>
+          <span class="menu-title">Participations</span>
+      </a>
+    </li>
+    <li class="nav-item {{ active_class(['/challenges']) }}">
+      <a class="nav-link" href="{{ url('/challenges') }}">
+          <i class="menu-icon mdi mdi-account-multiple"></i>
+          <span class="menu-title">Challenges</span>
+      </a>
+    </li>
+
     <li class="nav-item {{ active_class(['/admin/resources']) }}">
       <a class="nav-link" href="{{ url('/admin/resources') }}">
           <i class="menu-icon mdi mdi-account-multiple"></i>
@@ -194,7 +213,7 @@
           </li>
         </ul>
       </div>
-    </li>  
+    </li>
     <li class="nav-item {{ active_class(['activity-logs/*']) }}">
   <a class="nav-link" data-toggle="collapse" href="#activity-logs" aria-expanded="{{ is_active_route(['activity-logs/*']) }}" aria-controls="activity-logs">
     <i class="menu-icon mdi mdi-notebook"></i>
