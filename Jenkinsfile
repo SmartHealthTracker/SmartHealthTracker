@@ -4,7 +4,8 @@ pipeline {
     environment {
         APP_NAME = "smarthealth"
         DOCKER_IMAGE = "smarthealth:latest"
-        NEXUS_URL = '192.168.33.10:8083'
+        NEXUS_URL = '192.168.33.10:8081'
+        NEXUS_REPO = 'SH' 
         NEXUS_CREDENTIAL_ID = "nexus"
     }
 
@@ -45,7 +46,6 @@ pipeline {
             }
         }
 
-
         stage('SonarQube Analysis') {
             steps {
                 script {
@@ -62,8 +62,6 @@ pipeline {
             }
         }
 
-
-
         stage('Build Docker Image') {
             steps {
                 script {
@@ -76,8 +74,8 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry("http://${NEXUS_URL}", NEXUS_CREDENTIAL_ID) {
-                        sh "docker tag ${DOCKER_IMAGE} ${NEXUS_URL}/smarthealth:latest"
-                        sh "docker push ${NEXUS_URL}/smarthealth:latest"
+                        sh "docker tag ${DOCKER_IMAGE} ${NEXUS_URL}/${NEXUS_REPO}:latest"
+                        sh "docker push ${NEXUS_URL}/${NEXUS_REPO}:latest"
                     }
                 }
             }
@@ -87,14 +85,14 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry("http://${NEXUS_URL}", NEXUS_CREDENTIAL_ID) {
-                        sh "docker pull ${NEXUS_URL}/smarthealth:latest"
+                        sh "docker pull ${NEXUS_URL}/${NEXUS_REPO}:latest"
                         sh "docker-compose down"
                         sh "docker-compose up -d --build"
                     }
                 }
             }
         }
-    }
+    } 
 
     post {
         success {
