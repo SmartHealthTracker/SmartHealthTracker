@@ -11,6 +11,6 @@ class ExampleTest extends TestCase
         $response = $this->get('/'); // accès sans être connecté
 
         $response->assertStatus(302); // Laravel redirige
-        $response->assertRedirect('/login'); // vérifie la redirection
+        $response->assertRedirect('/user-pages/login');
     }
 }
