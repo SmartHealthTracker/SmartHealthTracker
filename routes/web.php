@@ -1,4 +1,5 @@
 <?php
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
@@ -7,13 +8,52 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\ChallengeController;
 use App\Http\Controllers\ParticipationController;
+use App\Http\Controllers\HabitController;
+use App\Http\Controllers\HabitTrackingController;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\View;
+use App\Http\Controllers\NutritionController;
+use App\Http\Controllers\HealthController;
+use App\Http\Controllers\UserControllerr;
+use App\Http\Controllers\ActivityController;
+use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\ChallengeParticipationController;
+use App\Http\Controllers\ChatbotController;
 
 
 Route::get('/', function () {
     return view('dashboard');
 });
+
+Route::get('/cha-parti-dashboard', [ChallengeParticipationController::class, 'index'])
+    ->name('cha-parti-dashboard');
+    Route::get('/challenges/{challenge}', [ChallengeController::class, 'show'])
+    ->name('challenge.show');
+
+Route::resource('activities', ActivityController::class)
+    ->names('activities')
+    ->except('show');
+
+Route::resource('activity-logs', ActivityLogController::class)
+    ->names('activity_logs')
+    ->except('show');
+
 Route::resource('challenges', ChallengeController::class);
-Route::resource('participations', ParticipationController::class);
+
+// Single Challenge (for calendar link)
+Route::get('/challenges/{challenge}', [ChallengeController::class, 'show'])
+    ->name('challenges.show');
+
+// Export PDF
+
+Route::get('/challenges/export-pdf', [ChallengeParticipationController::class, 'exportPdf'])
+    ->name('challenges.exportPdf');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/participations', [ParticipationController::class, 'index']);
+    Route::post('/participations', [ParticipationController::class, 'store']);
+    Route::put('/participations/{participation}', [ParticipationController::class, 'update']);
+    Route::delete('/participations/{participation}', [ParticipationController::class, 'destroy']);
+});Route::post('/chatbot/reply', [ChatbotController::class, 'reply'])->name('chatbot.reply');
 
 
 Route::middleware(['auth'])->group(function () {
@@ -111,6 +151,10 @@ Route::group(['prefix' => 'user-pages'], function() {
     Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
     Route::post('login', [LoginController::class, 'login'])->name('login.post');
     Route::post('logout', [LoginController::class, 'logout'])->name('logout');
+    Route::get('deleteusers', [UserControllerr::class, 'index'])->name('users.index');
+    Route::delete('deleteusers/{user}', [UserControllerr::class, 'destroy'])->name('users.destroy');
+    Route::post('deleteusers/delete-all', [UserControllerr::class, 'deleteAll'])->name('users.deleteAll');
+    Route::patch('toggle-block/{user}', [UserControllerr::class, 'toggleBlock'])->name('users.toggleBlock');
 
     Route::get('login-2', function () { return view('pages.user-pages.login-2'); });
     Route::get('multi-step-login', function () { return view('pages.user-pages.multi-step-login'); });
@@ -164,9 +208,36 @@ Route::get('/clear-cache', function() {
     Artisan::call('cache:clear');
     return "Cache is cleared";
 });
+// Habits Routes
+Route::resource('habits', HabitController::class);
+Route::post('/habits/{habit}/start', [HabitController::class, 'start'])->name('habits.start');
+
+Route::post('/habit-trackings/{tracking}/update', [HabitTrackingController::class, 'updateProgress'])->name('habit.updateProgress');
+Route::post('/habit-trackings/{tracking}/finish', [HabitTrackingController::class, 'finish'])->name('habit.finish');
+
+Route::post('/nutrition', [NutritionController::class, 'getNutrition'])->name('nutrition.get');
+
+// routes/web.php
+
+Route::prefix('health')->middleware(['auth'])->group(function () {
+    // Page principale du Health Tracker (affiche le formulaire et l'historique)
+    Route::get('/', [HealthController::class, 'index'])->name('health.index');
+
+    // Page des logs (pour route('health.logs'))
+    Route::get('/logs', [HealthController::class, 'logs'])->name('health.logs');
+
+    // CRUD HealthTracker (ajout d'un log)
+    Route::post('/', [HealthController::class, 'store'])->name('health.store');
+
+    // Suppression d'un log
+    Route::delete('/{healthLog}', [HealthController::class, 'destroy'])->name('health.destroy');
+});
+
 
 // 404 for undefined routes
 Route::any('/{page?}',function(){
     return View::make('pages.error-pages.error-404');
 })->where('page','.*');
-
+Route::any('/{page?}',function(){
+    return View::make('pages.error-pages.error-404');
+})->where('page','.*');

@@ -6,9 +6,13 @@
     "type": "project",
     "require": {
         "php": "^8.2",
+        "barryvdh/laravel-dompdf": "^3.1",
+        "doctrine/dbal": "^4.3",
         "laravel/framework": "^12.0",
         "laravel/socialite": "^5.23",
         "laravel/tinker": "^3.2",
+        "nesbot/carbon": "^3.10",
+        "openai-php/laravel": "^0.17.1",
         "spatie/laravel-html": "*"
     },
     "require-dev": {
@@ -37,6 +41,7 @@
         "preferred-install": "dist",
         "allow-plugins": {
             "kylekatarnls/update-helper": true,
+            "php-http/discovery": true,
             "symfony/thanks": true
         }
     },

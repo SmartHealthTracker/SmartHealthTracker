@@ -39,6 +39,12 @@
         </button>
       </div>
     </li>
+    <li class="nav-item {{ active_class(['/']) }}">
+      <a class="nav-link" href="{{ url('/') }}">
+        <i class="menu-icon mdi mdi-television"></i>
+        <span class="menu-title">Dashboard</span>
+      </a>
+    </li>
     {{-- Lien vers les utilisateurs --}}
     <li class="nav-item {{ active_class(['admin/users']) }}">
       <a class="nav-link" href="{{ url('/admin/users') }}">
@@ -46,12 +52,58 @@
         <span class="menu-title">Utilisateurs</span>
       </a>
     </li>
-    <li class="nav-item {{ active_class(['/']) }}">
-      <a class="nav-link" href="{{ url('/') }}">
-        <i class="menu-icon mdi mdi-television"></i>
-        <span class="menu-title">Dashboard</span>
+<li class="nav-item {{ active_class(['health/*']) }}">
+  <a class="nav-link" data-toggle="collapse" href="#healthMenu" aria-expanded="{{ is_active_route(['health/*']) }}" aria-controls="healthMenu">
+    <i class="menu-icon mdi mdi-heart-pulse"></i>
+    <span class="menu-title">Smart Health Tracker</span>
+    <i class="menu-arrow"></i>
+  </a>
+  <div class="collapse {{ show_class(['health/*']) }}" id="healthMenu">
+    <ul class="nav flex-column sub-menu">
+      <li class="nav-item {{ active_class(['health']) }}">
+        <a class="nav-link" href="{{ route('health.index') }}">Dashboard</a>
+      </li>
+      <li class="nav-item {{ active_class(['health/logs']) }}">
+        <a class="nav-link" href="{{ route('health.logs') }}">Logs</a>
+      </li>
+    </ul>
+  </div>
+</li>
+
+
+   {{-- Lien vers les habitudes --}}
+    <li class="nav-item {{ active_class(['habits*']) }}">
+        <a class="nav-link" data-toggle="collapse" href="#habitsMenu" aria-expanded="{{ is_active_route(['habits*']) }}" aria-controls="habitsMenu">
+        <i class="menu-icon mdi mdi-clipboard-check"></i>
+        <span class="menu-title">Habits</span>
+        <i class="menu-arrow"></i>
+         </a>
+    <div class="collapse {{ show_class(['habits*']) }}" id="habitsMenu">
+        <ul class="nav flex-column sub-menu">
+            <li class="nav-item {{ active_class(['habits']) }}">
+                <a class="nav-link" href="{{ route('habits.index') }}">Liste des Habits</a>
+            </li>
+            <li class="nav-item {{ active_class(['habits/create']) }}">
+                <a class="nav-link" href="{{ route('habits.create') }}">Ajouter un Habit</a>
+            </li>
+        </ul>
+    </div>
+    </li>
+   
+    <li class="nav-item {{ active_class(['/admin/resources']) }}">
+      <a class="nav-link" href="{{ url('/admin/resources') }}">
+          <i class="menu-icon mdi mdi-account-multiple"></i>
+          <span class="menu-title">Resources</span>
       </a>
     </li>
+    <li class="nav-item {{ active_class(['/admin/comments']) }}">
+      <a class="nav-link" href="{{ url('/admin/comments') }}">
+          <i class="menu-icon mdi mdi-account-multiple"></i>
+          <span class="menu-title">Comments</span>
+      </a>
+    </li>
+
+
     <li class="nav-item {{ active_class(['basic-ui/*']) }}">
       <a class="nav-link" data-toggle="collapse" href="#basic-ui" aria-expanded="{{ is_active_route(['basic-ui/*']) }}" aria-controls="basic-ui">
         <i class="menu-icon mdi mdi-dna"></i>
@@ -94,6 +146,9 @@
   <div class="collapse {{ show_class(['user-pages/*']) }}" id="user-pages">
     <ul class="nav flex-column sub-menu">
       <li class="nav-item {{ active_class(['user-pages/login']) }}">
+        <a class="nav-link" href="{{ url('/cha-parti-dashboard') }}">OverView</a>
+      </li>
+      <li class="nav-item {{ active_class(['user-pages/login']) }}">
         <a class="nav-link" href="{{ url('/participations') }}">Participation</a>
       </li>
       <li class="nav-item {{ active_class(['user-pages/register']) }}">
@@ -120,9 +175,40 @@
           <li class="nav-item {{ active_class(['user-pages/lock-screen']) }}">
             <a class="nav-link" href="{{ url('/user-pages/lock-screen') }}">Lock Screen</a>
           </li>
+          <li class="nav-item {{ active_class(['user-pages/deleteusers']) }}">
+            <a class="nav-link" href="{{ url('/user-pages/deleteusers') }}"> Users</a>
+          </li>
         </ul>
       </div>
     </li>
+    <li class="nav-item {{ active_class(['activities/*']) }}">
+      <a class="nav-link" data-toggle="collapse" href="#activities" aria-expanded="{{ is_active_route(['activities/*']) }}" aria-controls="activities">
+        <i class="menu-icon mdi mdi-dna"></i>
+        <span class="menu-title">Activities</span>
+        <i class="menu-arrow"></i>
+      </a>
+      <div class="collapse {{ show_class(['activities/*']) }}" id="activities">
+        <ul class="nav flex-column sub-menu">
+          <li class="nav-item {{ active_class(['activities']) }}">
+            <a class="nav-link" href="{{ route('activities.index') }}">Activities</a>
+          </li>
+        </ul>
+      </div>
+    </li>  
+    <li class="nav-item {{ active_class(['activity-logs/*']) }}">
+  <a class="nav-link" data-toggle="collapse" href="#activity-logs" aria-expanded="{{ is_active_route(['activity-logs/*']) }}" aria-controls="activity-logs">
+    <i class="menu-icon mdi mdi-notebook"></i>
+    <span class="menu-title">Activity Logs</span>
+    <i class="menu-arrow"></i>
+  </a>
+  <div class="collapse {{ show_class(['activity-logs/*']) }}" id="activity-logs">
+    <ul class="nav flex-column sub-menu">
+      <li class="nav-item {{ active_class(['activity-logs']) }}">
+        <a class="nav-link" href="{{ route('activity_logs.index') }}">Activity Logs</a>
+      </li>
+    </ul>
+  </div>
+</li>
     <li class="nav-item">
       <a class="nav-link" href="https://www.bootstrapdash.com/demo/star-laravel-free/documentation/documentation.html" target="_blank">
         <i class="menu-icon mdi mdi-file-outline"></i>
