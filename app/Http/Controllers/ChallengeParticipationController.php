@@ -19,7 +19,7 @@ class ChallengeParticipationController extends Controller
         $totalChallenges = Challenge::count();
         $totalParticipations = Participation::count();
         $approved = Participation::where('status', 'approved')->count();
-        $pending = Participation::where('status', 'pending')->count();
+        $rejected = Participation::where('status', 'rejected')->count(); // <-- changed
 
         // --- Challenges Created Per Month ---
         $challengesPerMonth = Challenge::select(
@@ -72,7 +72,7 @@ class ChallengeParticipationController extends Controller
             'totalChallenges',
             'totalParticipations',
             'approved',
-            'pending',
+            'rejected',
             'months',
             'counts',
             'topChallenges',

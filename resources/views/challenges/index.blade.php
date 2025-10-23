@@ -1,37 +1,37 @@
 @extends('layout.master')
 
-@section('title', 'Challenge & Participation Dashboard')
+@section('title', 'Tableau de bord Challenges & Participations')
 
 @section('content')
 <div class="row mt-4">
     <div class="col-md-12">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4>🗓️ Challenge Timetable</h4>
+            <h4>🗓️ Calendrier des Challenges</h4>
             <button class="btn btn-success btn-sm" id="addChallengeBtn">
-                <i class="mdi mdi-plus"></i> Add Challenge
+                <i class="mdi mdi-plus"></i> Ajouter un Challenge
             </button>
         </div>
 
-        {{-- Search & Sort --}}
+        {{-- Recherche & Tri --}}
         <div class="d-flex justify-content-center mb-4 flex-wrap align-items-center gap-3">
-            <input type="text" id="searchInput" class="form-control w-50 text-center shadow-sm" placeholder="Search by first letter">
+            <input type="text" id="searchInput" class="form-control w-50 text-center shadow-sm" placeholder="Rechercher par première lettre">
             <div class="btn-group shadow-sm">
                 <button class="btn btn-outline-primary btn-sm px-4" id="sortAsc">A-Z</button>
                 <button class="btn btn-outline-primary btn-sm px-4" id="sortDesc">Z-A</button>
             </div>
         </div>
 
-        {{-- Table --}}
+        {{-- Tableau --}}
         <div class="card shadow-sm border-0 rounded-3">
             <div class="card-body table-responsive p-0">
                 <table class="table table-striped table-hover mb-0 rounded-3" id="challengeTable">
                     <thead class="table-light">
                         <tr>
                             <th style="display:none;">#</th>
-                            <th>Challenge Name</th>
-                            <th>Start Date</th>
-                            <th>End Date</th>
-                            <th>Participation</th>
+                            <th>Nom du Challenge</th>
+                            <th>Date de début</th>
+                            <th>Date de fin</th>
+                            <th>Participations</th>
                             <th class="text-center">Actions</th>
                         </tr>
                     </thead>
@@ -53,9 +53,9 @@
 
                 {{-- Pagination --}}
                 <div class="d-flex justify-content-center mt-3 gap-3">
-                    <button id="prevPage" class="btn btn-outline-secondary btn-sm">Prev</button>
+                    <button id="prevPage" class="btn btn-outline-secondary btn-sm">Précédent</button>
                     <span id="pageInfo"></span>
-                    <button id="nextPage" class="btn btn-outline-secondary btn-sm">Next</button>
+                    <button id="nextPage" class="btn btn-outline-secondary btn-sm">Suivant</button>
                 </div>
             </div>
         </div>
@@ -81,6 +81,25 @@ document.addEventListener('DOMContentLoaded', function() {
         return `${y}-${m}-${day}`;
     };
 
+    // ✅ Contrôle de saisie pour le nom
+    function validateRow(title, startDate, endDate) {
+        // Autoriser uniquement les lettres et espaces (y compris accents)
+        const nameRegex = /^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/;
+        if(!title.trim()) {
+            alert("Le nom du challenge ne peut pas être vide !");
+            return false;
+        }
+        if(!nameRegex.test(title)) {
+            alert("Le nom du challenge ne peut contenir que des lettres et des espaces !");
+            return false;
+        }
+        if(new Date(startDate) > new Date(endDate)) {
+            alert("La date de début doit être antérieure ou égale à la date de fin !");
+            return false;
+        }
+        return true;
+    }
+
     function renderTable() {
         const query = searchInput.value.toLowerCase();
         let filtered = rows.filter(r =>
@@ -101,7 +120,7 @@ document.addEventListener('DOMContentLoaded', function() {
         table.innerHTML = '';
         paginated.forEach(row => table.appendChild(row));
 
-        document.getElementById('pageInfo').textContent = `Page ${currentPage} of ${totalPages || 1}`;
+        document.getElementById('pageInfo').textContent = `Page ${currentPage} sur ${totalPages || 1}`;
     }
 
     searchInput.addEventListener('input', () => { currentPage = 1; renderTable(); });
@@ -115,7 +134,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     renderTable();
 
-    // Inline edit
+    // Édition inline avec contrôle de saisie
     table.addEventListener('click', e => {
         const target = e.target;
         if (target.classList.contains('editable')) {
@@ -131,8 +150,17 @@ document.addEventListener('DOMContentLoaded', function() {
             input.addEventListener('blur', () => {
                 const row = target.closest('tr');
                 const id = row.dataset.id;
-                if (input.type === 'date') target.textContent = formatDateToDisplay(input.value);
+                if(input.type === 'date') target.textContent = formatDateToDisplay(input.value);
                 else target.textContent = input.value;
+
+                let title = row.querySelector('.challenge-name').textContent;
+                let startDate = row.querySelector('.start-date').textContent.split('/').reverse().join('-');
+                let endDate = row.querySelector('.end-date').textContent.split('/').reverse().join('-');
+
+                if(!validateRow(title, startDate, endDate)) {
+                    target.textContent = oldValue; // revenir à l'ancienne valeur
+                    return;
+                }
 
                 fetch(`/challenges/${id}`, {
                     method: 'PUT',
@@ -141,21 +169,21 @@ document.addEventListener('DOMContentLoaded', function() {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        title: row.querySelector('.challenge-name').textContent,
-                        start_date: row.querySelector('.start-date').textContent.split('/').reverse().join('-'),
-                        end_date: row.querySelector('.end-date').textContent.split('/').reverse().join('-')
+                        title: title,
+                        start_date: startDate,
+                        end_date: endDate
                     })
                 });
             });
         }
     });
 
-    // Delete
+    // Suppression
     table.addEventListener('click', e => {
         if (e.target.closest('.deleteBtn')) {
             const row = e.target.closest('tr');
             const id = row.dataset.id;
-            if (confirm('Delete this challenge?')) {
+            if (confirm('Supprimer ce challenge ?')) {
                 fetch(`/challenges/${id}`, {
                     method: 'DELETE',
                     headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
@@ -168,14 +196,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Add
+    // Ajouter un challenge avec validation
     document.getElementById('addChallengeBtn').addEventListener('click', () => {
         const today = new Date().toISOString().split('T')[0];
         fetch(`/challenges`, {
             method: 'POST',
             headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Content-Type': 'application/json' },
-            body: JSON.stringify({ title: 'New Challenge', start_date: today, end_date: today })
+            body: JSON.stringify({ title: 'NouveauChallenge', start_date: today, end_date: today })
         }).then(res => res.json()).then(data => {
+            if(!validateRow(data.title, data.start_date, data.end_date)) return;
             const newRow = document.createElement('tr');
             newRow.dataset.id = data.id;
             newRow.innerHTML = `

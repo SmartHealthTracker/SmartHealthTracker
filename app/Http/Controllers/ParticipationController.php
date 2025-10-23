@@ -36,7 +36,7 @@ class ParticipationController extends Controller
 
         $status = $participantCount >= 5 ? 'rejected' : 'approved';
 
-        // Create participation with logged-in user
+        // Create participation for logged-in user
         $participation = Participation::create([
             'challenge_id' => $challenge->id,
             'user_id' => auth()->id(),
@@ -52,11 +52,11 @@ class ParticipationController extends Controller
             'id' => $participation->id,
             'challenge_name' => $challenge->name,
             'user_name' => auth()->user()->name,
-            'status' => $status
+            'status' => $status,
         ]);
     }
 
-    // Update participation (admin)
+    // Update participation (admin or owner)
     public function update(Request $request, Participation $participation)
     {
         $data = $request->validate([
@@ -66,10 +66,12 @@ class ParticipationController extends Controller
             'status' => 'nullable|in:pending,approved,rejected',
         ]);
 
+        $statusChanged = isset($data['status']) && $data['status'] != $participation->status;
+
         $participation->update($data);
 
         // Send email if status changed
-        if(isset($data['status'])) {
+        if($statusChanged){
             Mail::to($participation->user->email)->send(new ParticipationStatusMail($participation));
         }
 
