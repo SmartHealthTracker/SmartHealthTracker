@@ -220,11 +220,8 @@
       </li>
     </ul>
   </div>
-  <li class="nav-item">
-  <a class="nav-link" href="{{ route('health_assistant.index') }}">
-    🤖 Assistant IA
-  </a>
-</li>
+  <div>
+</div>
 </li>
     <li class="nav-item">
       <a class="nav-link" href="https://www.bootstrapdash.com/demo/star-laravel-free/documentation/documentation.html" target="_blank">
