@@ -27,7 +27,7 @@ class CommentController extends Controller
     {
         $request->validate([
             'resource_id' => 'required|exists:resources,id',
-            'content' => 'required|string',
+            'content' => 'required|string|min:20|max:500',
             'date' => 'required|date',
         ]);
 
@@ -57,7 +57,7 @@ class CommentController extends Controller
     {
         $request->validate([
             'resource_id' => 'required|exists:resources,id',
-            'content' => 'required|string',
+            'content' => 'required|string|min:20|max:500',
             'date' => 'required|date',
         ]);
 

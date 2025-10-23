@@ -4,7 +4,7 @@
 <div class="container">
     <h1>Ajouter une ressource</h1>
 
-    <form action="{{ route('resources.store') }}" method="POST">
+    <form action="{{ route('resources.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <div class="mb-3">
             <label for="title" class="form-label">Titre</label>
@@ -19,6 +19,11 @@
         <div class="mb-3">
             <label for="content" class="form-label">Contenu</label>
             <textarea name="content" id="content" class="form-control" required></textarea>
+        </div>
+        
+        <div class="mb-3">
+            <label for="image" class="form-label">Image</label>
+            <input type="file" name="image" id="image" class="form-control" accept="image/*">
         </div>
 
         <button type="submit" class="btn btn-primary">Ajouter</button>

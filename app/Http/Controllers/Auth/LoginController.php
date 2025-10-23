@@ -23,24 +23,32 @@ class LoginController extends Controller
 
     // Gérer la tentative de login
     public function login(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|string',
-        ]);
+{
+    $request->validate([
+        'email' => 'required|email',
+        'password' => 'required|string',
+    ]);
 
-        $credentials = $request->only('email', 'password');
+    $credentials = $request->only('email', 'password');
 
-        if (Auth::attempt($credentials, $request->filled('remember'))) {
-            $request->session()->regenerate();
+    if (Auth::attempt($credentials, $request->filled('remember'))) {
+        $request->session()->regenerate();
 
-            return redirect('/'); 
+        $user = Auth::user();
+
+        // 🔹 Redirection selon le rôle
+        if ($user->role === 'admin') {
+            return redirect('/'); // admin → dashboard
+        } else {
+            return redirect('/home'); // user → home
         }
-
-        return back()->withErrors([
-            'email' => 'Les informations de connexion sont incorrectes.',
-        ])->withInput($request->except('password'));
     }
+
+    return back()->withErrors([
+        'email' => 'Les informations de connexion sont incorrectes.',
+    ])->withInput($request->except('password'));
+}
+
 
     // Déconnexion
     public function logout(Request $request)

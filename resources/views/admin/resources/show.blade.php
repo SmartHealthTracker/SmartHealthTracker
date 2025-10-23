@@ -17,5 +17,7 @@
         <button class="btn btn-danger" onclick="return confirm('Êtes-vous sûr ?')">Supprimer</button>
     </form>
     <a href="{{ route('resources.index') }}" class="btn btn-secondary">Retour à la liste</a>
+
+
 </div>
 @endsection
