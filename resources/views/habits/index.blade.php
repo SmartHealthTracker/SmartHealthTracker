@@ -135,29 +135,112 @@ document.addEventListener('DOMContentLoaded', function() {
                (s < 10 ? '0' : '') + s;
     }
 
+    // Function to update backend progress
+    function updateBackendProgress(trackingId, progress, habitId) {
+        return fetch(`/habit-trackings/${trackingId}/update-progress`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ progress: progress })
+        })
+        .then(res => res.json())
+        .then(data => {
+            console.log(`Progress updated to ${progress}% for habit ${habitId}`);
+            return data;
+        })
+        .catch(err => {
+            console.error('Error updating progress:', err);
+        });
+    }
+
+    // Function to complete habit in backend
+    function completeHabitBackend(trackingId, habitId) {
+        return fetch(`/habit-trackings/${trackingId}/finish`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            console.log(`Habit ${habitId} completed in backend`);
+            return data;
+        })
+        .catch(err => {
+            console.error('Error completing habit:', err);
+        });
+    }
+
+    // Function to update UI when habit is completed
+    function completeHabitUI(habitId, trackingId) {
+        const button = document.querySelector(`.start-btn[data-id="${habitId}"]`);
+        const progressBar = document.getElementById('progress-' + habitId);
+        const progressLabel = document.getElementById('progress-label-' + habitId);
+        const resultSpan = document.getElementById('result-' + habitId);
+        const timerSpan = document.getElementById('timer-' + habitId);
+
+        if (button) {
+            button.textContent = "Completed";
+            button.classList.remove("btn-warning", "btn-outline-primary");
+            button.classList.add("btn-success");
+            button.disabled = true;
+        }
+
+        if (progressBar) progressBar.style.width = '100%';
+        if (progressLabel) progressLabel.textContent = '100%';
+        if (resultSpan) resultSpan.textContent = 'Done';
+        if (timerSpan) timerSpan.style.display = 'none';
+
+        // Clear any running timers
+        if (timers[habitId]) {
+            clearInterval(timers[habitId]);
+            delete timers[habitId];
+        }
+    }
+
     // Chronomètre auto pour les activités déjà en cours (après refresh)
     document.querySelectorAll('[id^="timer-"]').forEach(function(timerSpan) {
         const habitId = timerSpan.id.replace('timer-', '');
         const startedAt = parseInt(timerSpan.dataset.started);
         const duration = parseInt(timerSpan.dataset.duration);
-        if (startedAt && duration) {
+        const trackingId = document.querySelector(`.start-btn[data-id="${habitId}"]`)?.dataset.tracking;
+
+        if (startedAt && duration && trackingId) {
             function updateTimer() {
                 const now = Math.floor(Date.now() / 1000);
                 const elapsed = now - startedAt;
                 const percent = Math.min(100, Math.round((elapsed / (duration * 60)) * 100));
+
                 const progressBar = document.getElementById('progress-' + habitId);
                 const progressLabel = document.getElementById('progress-label-' + habitId);
-                progressBar.style.width = percent + '%';
-                progressLabel.textContent = percent + '%';
-                timerSpan.textContent = formatTime(elapsed);
+
+                if (progressBar) progressBar.style.width = percent + '%';
+                if (progressLabel) progressLabel.textContent = percent + '%';
+                if (timerSpan) timerSpan.textContent = formatTime(elapsed);
+
+                // Update backend progress every 10 seconds
+                if (elapsed % 10 === 0) {
+                    updateBackendProgress(trackingId, percent, habitId);
+                }
+
                 if (percent >= 100) {
-                    timerSpan.textContent = formatTime(duration * 60);
-                    clearInterval(timers[habitId]);
+                    if (timerSpan) timerSpan.textContent = formatTime(duration * 60);
+                    if (timers[habitId]) clearInterval(timers[habitId]);
+
+                    // Complete in backend and update UI
+                    completeHabitBackend(trackingId, habitId)
+                        .then(() => {
+                            completeHabitUI(habitId, trackingId);
+                        });
                 }
             }
+
             updateTimer();
             timers[habitId] = setInterval(updateTimer, 1000);
-            timerSpan.style.display = '';
+            if (timerSpan) timerSpan.style.display = '';
         }
     });
 
@@ -172,6 +255,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (intervals[habitId]) clearInterval(intervals[habitId]);
             if (timers[habitId]) clearInterval(timers[habitId]);
+
             if (!duration || duration <= 0) {
                 Swal.fire('Erreur', 'Durée non définie pour cette habitude.', 'error');
                 return;
@@ -179,7 +263,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
             fetch(`/habits/${habitId}/start`, {
                 method: 'POST',
-                headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Content-Type': 'application/json'},
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json'
+                },
                 body: JSON.stringify({})
             })
             .then(res => res.json())
@@ -191,29 +278,52 @@ document.addEventListener('DOMContentLoaded', function() {
                 button.classList.add("btn-warning");
 
                 // Récupérer le timestamp de départ pour le chronomètre
-                fetch(`/habit-trackings/${trackingId}`)
+                    fetch(`/habit-trackings/${trackingId}`) 
                     .then(res => res.json())
                     .then(trackingData => {
                         let startedAt = trackingData.started_at
                             ? Math.floor(new Date(trackingData.started_at).getTime() / 1000)
                             : Math.floor(Date.now() / 1000);
 
-                        timerSpan.style.display = '';
+                        if (timerSpan) {
+                            timerSpan.style.display = '';
+                            timerSpan.dataset.started = startedAt;
+                        }
+
                         function updateTimer() {
                             const now = Math.floor(Date.now() / 1000);
                             const elapsed = now - startedAt;
                             const percent = Math.min(100, Math.round((elapsed / (duration * 60)) * 100));
-                            progressBar.style.width = percent + '%';
-                            progressLabel.textContent = percent + '%';
-                            timerSpan.textContent = formatTime(elapsed);
+
+                            if (progressBar) progressBar.style.width = percent + '%';
+                            if (progressLabel) progressLabel.textContent = percent + '%';
+                            if (timerSpan) timerSpan.textContent = formatTime(elapsed);
+
+                            // Update backend progress every 10 seconds
+                            if (elapsed % 10 === 0) {
+                                updateBackendProgress(trackingId, percent, habitId);
+                            }
+
                             if (percent >= 100) {
-                                timerSpan.textContent = formatTime(duration * 60);
-                                clearInterval(timers[habitId]);
+                                if (timerSpan) timerSpan.textContent = formatTime(duration * 60);
+                                if (timers[habitId]) clearInterval(timers[habitId]);
+
+                                // Complete in backend and update UI
+                                completeHabitBackend(trackingId, habitId)
+                                    .then(() => {
+                                        completeHabitUI(habitId, trackingId);
+                                        Swal.fire('Bravo!', 'Habitude complétée avec succès!', 'success');
+                                    });
                             }
                         }
+
                         updateTimer();
                         timers[habitId] = setInterval(updateTimer, 1000);
                     });
+            })
+            .catch(err => {
+                console.error('Error starting habit:', err);
+                Swal.fire('Erreur', 'Impossible de démarrer l\'habitude.', 'error');
             });
         });
     });
@@ -221,18 +331,24 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.done-btn').forEach(button => {
         button.addEventListener('click', () => {
             const habitId = button.dataset.id;
-            fetch(`/habits/${habitId}/start`, {method: 'POST', headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'}})
+            fetch(`/habits/${habitId}/start`, {
+                method: 'POST',
+                headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
+            })
             .then(res => res.json())
             .then(data => {
                 const trackingId = data.tracking_id;
-                fetch(`/habit-trackings/${trackingId}/finish`, {method: 'POST', headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'}})
+                fetch(`/habit-trackings/${trackingId}/finish`, {
+                    method: 'POST',
+                    headers: {'X-CSRF-TOKEN': '{{ csrf_token() }}'}
+                })
                 .then(() => {
                     const progressBar = document.getElementById('progress-' + habitId);
                     const progressLabel = document.getElementById('progress-label-' + habitId);
                     const resultSpan = document.getElementById('result-' + habitId);
-                    progressBar.style.width = '100%';
-                    progressLabel.textContent = '100%';
-                    resultSpan.textContent = 'Done';
+                    if (progressBar) progressBar.style.width = '100%';
+                    if (progressLabel) progressLabel.textContent = '100%';
+                    if (resultSpan) resultSpan.textContent = 'Done';
                     button.textContent = "Completed";
                     button.classList.remove("btn-outline-info");
                     button.classList.add("btn-success");

@@ -42,4 +42,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(\App\Models\HealthLog::class, 'user_id', 'id');
     }
+
+    public function objectives()
+    {
+        return $this->hasMany(Objective::class);
+    }
 }

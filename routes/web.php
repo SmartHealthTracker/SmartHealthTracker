@@ -10,6 +10,8 @@ use App\Http\Controllers\ChallengeController;
 use App\Http\Controllers\ParticipationController;
 use App\Http\Controllers\HabitController;
 use App\Http\Controllers\HabitTrackingController;
+use App\Http\Controllers\ObjectiveController;
+use App\Http\Controllers\WeatherSuggestionController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\View;
 use App\Http\Controllers\NutritionController;
@@ -190,27 +192,35 @@ Route::get('/clear-cache', function() {
 Route::resource('habits', HabitController::class);
 Route::post('/habits/{habit}/start', [HabitController::class, 'start'])->name('habits.start');
 
-Route::post('/habit-trackings/{tracking}/update', [HabitTrackingController::class, 'updateProgress'])->name('habit.updateProgress');
-Route::post('/habit-trackings/{tracking}/finish', [HabitTrackingController::class, 'finish'])->name('habit.finish');
+// Objectives Routes
+Route::get('/objectives', [ObjectiveController::class, 'index'])->name('objectives.index');
+Route::post('/objectives', [ObjectiveController::class, 'store'])->name('objectives.store');
+Route::patch('/objectives/{objective}', [ObjectiveController::class, 'update'])->name('objectives.update');
+Route::delete('/objectives/{objective}', [ObjectiveController::class, 'destroy'])->name('objectives.destroy');
+Route::get('/objectives/events', [ObjectiveController::class, 'events'])->name('objectives.events');
 
+// Weather suggestions API
+Route::get('/weather/suggestions', WeatherSuggestionController::class)->name('weather.suggestions');
+
+// Habit Tracking Routes - FIXED AND CLEANED UP
+Route::post('/habit-trackings/{tracking}/update-progress', [HabitTrackingController::class, 'updateProgress'])->name('habit-trackings.update-progress');
+Route::post('/habit-trackings/{tracking}/finish', [HabitTrackingController::class, 'finish'])->name('habit-trackings.finish');
+Route::get('/habit-trackings/{tracking}', [HabitTrackingController::class, 'show'])->name('habit-trackings.show'); // ADD THIS
+
+// Remove these duplicate routes:
+// Route::post('/habit-trackings/{tracking}/update', [HabitTrackingController::class, 'updateProgress'])->name('habit.updateProgress');
+// Route::post('/habits/complete/{tracking}', [HabitController::class, 'complete'])->name('habits.complete');
+
+// Nutrition Route
 Route::post('/nutrition', [NutritionController::class, 'getNutrition'])->name('nutrition.get');
 
-// routes/web.php
-
+// Health Routes
 Route::prefix('health')->middleware(['auth'])->group(function () {
-    // Page principale du Health Tracker (affiche le formulaire et l'historique)
     Route::get('/', [HealthController::class, 'index'])->name('health.index');
-
-    // Page des logs (pour route('health.logs'))
     Route::get('/logs', [HealthController::class, 'logs'])->name('health.logs');
-
-    // CRUD HealthTracker (ajout d'un log)
     Route::post('/', [HealthController::class, 'store'])->name('health.store');
-
-    // Suppression d'un log
     Route::delete('/{healthLog}', [HealthController::class, 'destroy'])->name('health.destroy');
 });
-
 
 // 404 for undefined routes
 Route::any('/{page?}',function(){

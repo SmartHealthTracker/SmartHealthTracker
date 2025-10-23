@@ -1,10 +1,10 @@
 <nav class="navbar default-layout col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
   <div class="text-center navbar-brand-wrapper d-flex align-items-top justify-content-center">
     <a class="navbar-brand brand-logo" href="{{ url('/') }}">
-      <img src="{{ url('assets/images/logo.svg') }}" alt="logo" /> 
+      <img src="{{ url('assets/images/logo.svg') }}" alt="logo" />
     </a>
     <a class="navbar-brand brand-logo-mini" href="{{ url('/') }}">
-      <img src="{{ url('assets/images/logo-mini.svg') }}" alt="logo" /> 
+      <img src="{{ url('assets/images/logo-mini.svg') }}" alt="logo" />
     </a>
   </div>
 
@@ -76,52 +76,25 @@
         </div>
       </li>
 
-      {{-- Notifications --}}
-      <li class="nav-item dropdown">
-        <a class="nav-link count-indicator dropdown-toggle" id="notificationDropdown" href="#" data-toggle="dropdown">
-          <i class="mdi mdi-bell-outline"></i>
-          <span class="count bg-success">4</span>
+    <li class="nav-item dropdown">
+    <a class="nav-link count-indicator dropdown-toggle" id="notificationDropdown" href="#" data-toggle="dropdown">
+        <i class="mdi mdi-bell-outline"></i>
+
+    </a>
+    <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list pb-0" aria-labelledby="notificationDropdown">
+        <a class="dropdown-item py-3 border-bottom">
+            <span class="badge badge-pill badge-primary float-right">Voir tout</span>
         </a>
-        <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list pb-0" aria-labelledby="notificationDropdown">
-          <a class="dropdown-item py-3 border-bottom">
-            <p class="mb-0 font-weight-medium float-left">4 new notifications</p>
-            <span class="badge badge-pill badge-primary float-right">View all</span>
-          </a>
-          <a class="dropdown-item preview-item py-3">
-            <div class="preview-thumbnail">
-              <i class="mdi mdi-alert m-auto text-primary"></i>
-            </div>
-            <div class="preview-item-content">
-              <h6 class="preview-subject font-weight-normal text-dark mb-1">Application Error</h6>
-              <p class="font-weight-light small-text mb-0">Just now</p>
-            </div>
-          </a>
-          <a class="dropdown-item preview-item py-3">
-            <div class="preview-thumbnail">
-              <i class="mdi mdi-settings m-auto text-primary"></i>
-            </div>
-            <div class="preview-item-content">
-              <h6 class="preview-subject font-weight-normal text-dark mb-1">Settings</h6>
-              <p class="font-weight-light small-text mb-0">Private message</p>
-            </div>
-          </a>
-          <a class="dropdown-item preview-item py-3">
-            <div class="preview-thumbnail">
-              <i class="mdi mdi-airballoon m-auto text-primary"></i>
-            </div>
-            <div class="preview-item-content">
-              <h6 class="preview-subject font-weight-normal text-dark mb-1">New user registration</h6>
-              <p class="font-weight-light small-text mb-0">2 days ago</p>
-            </div>
-          </a>
-        </div>
-      </li>
+
+
+
+
 
       {{-- Profil utilisateur avec logout --}}
       <li class="nav-item dropdown d-none d-xl-inline-block">
         <a class="nav-link dropdown-toggle" id="UserDropdown" href="#" data-toggle="dropdown" aria-expanded="false">
           <span class="profile-text d-none d-md-inline-flex">{{ Auth::user()->name ?? 'Utilisateur' }} !</span>
-          <img class="img-xs rounded-circle" src="{{ Auth::user()->profile_image ?? url('assets/images/faces/face8.jpg') }}" alt="Profile image"> 
+          <img class="img-xs rounded-circle" src="{{ Auth::user()->profile_image ?? url('assets/images/faces/face8.jpg') }}" alt="Profile image">
         </a>
         <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="UserDropdown">
           <a class="dropdown-item p-0">

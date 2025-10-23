@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('activities', function (Blueprint $table) {
-             $table->id();
-            $table->string('name'); 
+            $table->id();
+            $table->string('name');
             $table->integer('calories_per_hour');
             $table->timestamps();
         });

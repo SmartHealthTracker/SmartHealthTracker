@@ -83,6 +83,9 @@
             <li class="nav-item {{ active_class(['habits']) }}">
                 <a class="nav-link" href="{{ route('habits.index') }}">Liste des Habits</a>
             </li>
+            <li class="nav-item {{ active_class(['objectives*']) }}">
+                <a class="nav-link" href="{{ route('objectives.index') }}">Objectives Calendar</a>
+            </li>
             <li class="nav-item {{ active_class(['habits/create']) }}">
                 <a class="nav-link" href="{{ route('habits.create') }}">Ajouter un Habit</a>
             </li>

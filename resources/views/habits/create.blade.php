@@ -70,8 +70,6 @@
                     <textarea class="form-control" id="description" name="description" rows="2">{{ old('description') }}</textarea>
                 </div>
 
-                <!-- Champ caché pour icône -->
-                <input type="hidden" name="icon" id="icon">
 
                 <button type="submit" class="btn btn-success">Ajouter</button>
                 <a href="{{ route('habits.index') }}" class="btn btn-light">Annuler</a>
