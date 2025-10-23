@@ -3,19 +3,14 @@
 namespace Tests\Feature;
 
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ExampleTest extends TestCase
 {
-    /**
-     * A basic test example.
-     *
-     * @return void
-     */
-    public function testBasicTest()
+    public function testHomeRedirectsToLogin()
     {
-        $response = $this->get('/');
+        $response = $this->get('/'); // accès sans être connecté
 
-        $response->assertStatus(200);
+        $response->assertStatus(302); // Laravel redirige
+        $response->assertRedirect('/login'); // vérifie la redirection
     }
 }
