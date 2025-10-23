@@ -2,29 +2,27 @@ pipeline {
     agent any
 
     environment {
-        registryCredentials = "nexus"
-        registry = "192.168.33.10:8083"
-        NEXUS_VERSION = "nexus3"
-        NEXUS_URL = '192.168.33.10:8083'
-        NEXUS_PROTOCOL = "http"
-        NEXUS_REPOSITORY = "pi"
-        NEXUS_CREDENTIAL_ID = "nexus"
         APP_NAME = "smarthealth"
         DOCKER_IMAGE = "smarthealth:latest"
+        NEXUS_URL = '192.168.33.10:8083'
+        NEXUS_CREDENTIAL_ID = "nexus"
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'GestionEvent', url: 'https://github.com/SmartHealthTracker/SmartHealthTracker.git'
+                git branch: 'GestionEvent',
+                    url: 'https://github.com/SmartHealthTracker/SmartHealthTracker.git'
             }
-    }
-
+        }
 
         stage('Install dependencies') {
             steps {
                 script {
-                    sh 'composer install --no-interaction --prefer-dist'
+                    // Utilisation de Docker pour exécuter Composer
+                    sh '''
+                    docker run --rm -v $PWD:/app -w /app composer install --no-interaction --prefer-dist
+                    '''
                 }
             }
         }
@@ -32,7 +30,10 @@ pipeline {
         stage('Run Unit Tests') {
             steps {
                 script {
-                    sh 'vendor/bin/phpunit'
+                    // Exécuter PHPUnit dans un container PHP
+                    sh '''
+                    docker run --rm -v $PWD:/app -w /app php:8.2-cli bash -c "composer install --no-interaction --prefer-dist && vendor/bin/phpunit"
+                    '''
                 }
             }
         }
@@ -42,7 +43,6 @@ pipeline {
                 script {
                     def scannerHome = tool 'jenkinsSonar'
                     withSonarQubeEnv('SonarQube') {
-                        sh 'export SONAR_SCANNER_OPTS="-Xmx1024m"'
                         sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=${APP_NAME} -Dsonar.sources=."
                     }
                 }
@@ -60,9 +60,9 @@ pipeline {
         stage('Push to Nexus') {
             steps {
                 script {
-                    docker.withRegistry("http://${registry}", registryCredentials) {
-                        sh "docker tag ${DOCKER_IMAGE} ${registry}/smarthealth:latest"
-                        sh "docker push ${registry}/smarthealth:latest"
+                    docker.withRegistry("http://${NEXUS_URL}", NEXUS_CREDENTIAL_ID) {
+                        sh "docker tag ${DOCKER_IMAGE} ${NEXUS_URL}/smarthealth:latest"
+                        sh "docker push ${NEXUS_URL}/smarthealth:latest"
                     }
                 }
             }
