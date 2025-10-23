@@ -169,6 +169,23 @@
     </section>
     @endif
 
+
+    <!-- WORKOUT GENERATOR SECTION -->
+    <section class="section-padding bg-warning text-dark" id="workout-generator">
+        <div class="container text-center">
+            <h2 class="mb-3">Générateur de Plan d'Entraînement 🏋️‍♂️</h2>
+            <p class="mb-4">
+                Créez un plan d'entraînement personnalisé selon vos objectifs, votre niveau et vos préférences. 
+                Que vous souhaitiez prendre du muscle, améliorer votre cardio ou rester actif, notre générateur 
+                vous fournit un programme adapté et facile à suivre.
+            </p>
+            <a href="http://127.0.0.1:8000/workout" class="btn btn-dark btn-lg shadow-sm">
+                🚀 Générer mon plan maintenant
+            </a>
+        </div>
+    </section>
+
+
     <!-- ABOUT -->
     <section class="section-padding" id="about">
         <div class="container">

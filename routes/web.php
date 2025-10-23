@@ -12,6 +12,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\ResourceController;
 use App\Models\Resource;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\WorkoutController;
+
 
 
 Route::post('/admin/resources/{resource}/comment', [ResourceController::class, 'comment'])->name('resources.comment');
@@ -42,7 +44,11 @@ Route::get('/home', function () {
 });
 
 
+Route::get('/workout', function(){
+    return view('workout.form'); // formulaire pour choisir objectif et préférences
+});
 
+Route::post('/workout', [WorkoutController::class, 'generate'])->name('workout.generate');
 
 
 
