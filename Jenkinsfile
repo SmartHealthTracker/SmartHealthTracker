@@ -27,7 +27,12 @@ pipeline {
         stage('Generate APP_KEY') {
             steps {
                 sh '''
-                docker run --rm -v $PWD:/app -w /app composer bash -c "php artisan key:generate"
+                docker run --rm -v $PWD:/app -w /app composer bash -c "
+                    if [ ! -f .env ]; then
+                        cp .env.example .env
+                    fi
+                    php artisan key:generate
+                "
                 '''
             }
         }
