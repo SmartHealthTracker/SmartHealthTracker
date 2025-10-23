@@ -110,13 +110,9 @@
               </div>
             </div>
           </a>
-<<<<<<< HEAD
-          <a class="dropdown-item mt-2">Manage Accounts</a>
-=======
           <a href="{{ route('profile.show') }}" class="btn btn-primary">
               Manage Account
           </a>
->>>>>>> Ramez
           <a class="dropdown-item">Change Password</a>
           <a class="dropdown-item">Check Inbox</a>
 

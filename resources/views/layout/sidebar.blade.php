@@ -123,26 +123,23 @@
     </li>
 
 
-    <li class="nav-item {{ active_class(['basic-ui/*']) }}">
-      <a class="nav-link" data-toggle="collapse" href="#basic-ui" aria-expanded="{{ is_active_route(['basic-ui/*']) }}" aria-controls="basic-ui">
-        <i class="menu-icon mdi mdi-dna"></i>
-        <span class="menu-title">Basic UI Elements</span>
-        <i class="menu-arrow"></i>
-      </a>
-      <div class="collapse {{ show_class(['basic-ui/*']) }}" id="basic-ui">
-        <ul class="nav flex-column sub-menu">
-          <li class="nav-item {{ active_class(['basic-ui/buttons']) }}">
-            <a class="nav-link" href="{{ url('/basic-ui/buttons') }}">Buttons</a>
-          </li>
-          <li class="nav-item {{ active_class(['basic-ui/dropdowns']) }}">
-            <a class="nav-link" href="{{ url('/basic-ui/dropdowns') }}">Dropdowns</a>
-          </li>
-          <li class="nav-item {{ active_class(['basic-ui/typography']) }}">
-            <a class="nav-link" href="{{ url('/basic-ui/typography') }}">Typography</a>
-          </li>
-        </ul>
-      </div>
-    </li>
+   <li class="nav-item {{ active_class(['basic-ui/*']) }}">
+  <a class="nav-link" data-toggle="collapse" href="#basic-ui" aria-expanded="{{ is_active_route(['basic-ui/*']) }}" aria-controls="basic-ui">
+    <i class="menu-icon mdi mdi-dna"></i>
+    <span class="menu-title">Habit Objectif</span>
+    <i class="menu-arrow"></i>
+  </a>
+  <div class="collapse {{ show_class(['basic-ui/*']) }}" id="basic-ui">
+    <ul class="nav flex-column sub-menu">
+      <li class="nav-item {{ active_class(['habitssaif']) }}">
+        <a class="nav-link" href="{{ url('/habitssaif') }}">Objectifs</a>
+      </li>
+      <li class="nav-item {{ active_class(['habit-logs']) }}">
+        <a class="nav-link" href="{{ url('/habit-logs') }}">Logs</a>
+      </li>
+    </ul>
+  </div>
+</li>
 
     <li class="nav-item {{ active_class(['charts/chartjs']) }}">
       <a class="nav-link" href="{{ url('/charts/chartjs') }}">
@@ -172,6 +169,9 @@
       </li>
       <li class="nav-item {{ active_class(['user-pages/register']) }}">
         <a class="nav-link" href="{{ url('/challenges') }}">Challenge</a>
+      </li>
+      <li class="nav-item {{ active_class(['user-pages/register']) }}">
+        <a class="nav-link" href="{{ url('/challenges/calendar') }}">Calendar</a>
       </li>
     </ul>
   </div>
