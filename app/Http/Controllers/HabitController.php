@@ -110,18 +110,11 @@ class HabitController extends Controller
             [
                 'progress' => 0,
                 'state' => $habit->duration ? 'in_progress' : 'not_started',
-<<<<<<< HEAD
                 'started_at' => now() // <-- Ajoutez cette ligne
             ]
         );
 
         // Si le tracking existait déjà mais n'avait pas started_at, on le met à jour
-=======
-                'started_at' => now()
-            ]
-        );
-
->>>>>>> GestionDesHabitudes
         if ($tracking->started_at === null && $habit->duration) {
             $tracking->started_at = now();
             $tracking->save();
@@ -129,37 +122,4 @@ class HabitController extends Controller
 
         return response()->json(['tracking_id' => $tracking->id]);
     }
-<<<<<<< HEAD
-=======
-
-    // ✅ Terminer une habitude + Créer une notification
-    public function complete(HabitTracking $tracking)
-    {
-        $userId = Auth::id();
-
-        // Vérifie que le suivi appartient à l'utilisateur connecté
-        if ($tracking->user_id !== $userId) {
-            abort(403, 'Action non autorisée.');
-        }
-
-        // Marquer l'activité comme terminée
-        $tracking->update([
-            'state' => 'completed',
-            'progress' => 100,
-            'elapsed_minutes' => $tracking->elapsed_minutes ?? 0,
-        ]);
-
-        // ✅ Créer la notification
-        Notification::create([
-            'user_id' => $userId,
-            'habit_tracking_id' => $tracking->id,
-            'title' => 'Activité terminée 🎉',
-            'body' => 'Bravo ! Vous avez terminé votre habitude : ' . $tracking->habit->name,
-            'type' => 'success',
-            'read' => false,
-        ]);
-
-        return response()->json(['message' => 'Habitude terminée et notification envoyée.']);
-    }
->>>>>>> GestionDesHabitudes
 }
