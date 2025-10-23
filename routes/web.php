@@ -18,6 +18,7 @@ use App\Http\Controllers\UserControllerr;
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ChatbotController;
 
 
 Route::get('/', function () {
@@ -33,7 +34,10 @@ Route::resource('activity-logs', ActivityLogController::class)
 
 Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
 Route::get('/reports/pdf', [ReportController::class, 'downloadPDF'])->name('reports.pdf');
-Route::get('/reports/predictions', [ReportController::class, 'predictions'])->name('reports.predictions');    
+Route::get('/reports/predictions', [ReportController::class, 'predictions'])->name('reports.predictions');  
+Route::get('/chatbot', [ChatbotController::class, 'getResponse'])->name('chatbot.response');
+Route::get('/chatbot-page', [ChatbotController::class, 'index'])->name('chatbot.index');
+
 
 
 
