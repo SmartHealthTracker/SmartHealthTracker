@@ -2,6 +2,13 @@ pipeline {
     agent any
 
     environment {
+        registryCredentials = "nexus"
+        registry = "192.168.33.10:8083"
+        NEXUS_VERSION = "nexus3"
+        NEXUS_URL = '192.168.33.10:8083'
+        NEXUS_PROTOCOL = "http"
+        NEXUS_REPOSITORY = "pi"
+        NEXUS_CREDENTIAL_ID = "nexus"
         APP_NAME = "smarthealth"
         DOCKER_IMAGE = "smarthealth:latest"
     }
@@ -9,44 +16,67 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'GestionEvent', url: 'https://github.com/SmartHealthTracker/SmartHealthTracker.git'
+                git branch: 'GestionEvent', 
+                    url: 'https://github.com/SmartHealthTracker/SmartHealthTracker.git', 
+                    credentialsId: 'github_token'
+            }
+        }
+
+        stage('Install dependencies') {
+            steps {
+                script {
+                    sh 'composer install --no-interaction --prefer-dist'
+                }
+            }
+        }
+
+        stage('Run Unit Tests') {
+            steps {
+                script {
+                    sh 'vendor/bin/phpunit'
+                }
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    def scannerHome = tool 'jenkinsSonar'
+                    withSonarQubeEnv('SonarQube') {
+                        sh 'export SONAR_SCANNER_OPTS="-Xmx1024m"'
+                        sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=${APP_NAME} -Dsonar.sources=."
+                    }
+                }
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh 'docker build -t $DOCKER_IMAGE .'
+                    sh "docker build -t ${DOCKER_IMAGE} ."
                 }
             }
         }
 
-        stage('Run Tests') {
+        stage('Push to Nexus') {
             steps {
                 script {
-                    // Exemple : exécuter tests PHPUnit
-                    sh 'docker run --rm $DOCKER_IMAGE vendor/bin/phpunit'
+                    docker.withRegistry("http://${registry}", registryCredentials) {
+                        sh "docker tag ${DOCKER_IMAGE} ${registry}/smarthealth:latest"
+                        sh "docker push ${registry}/smarthealth:latest"
+                    }
                 }
             }
         }
 
-        stage('Push to Registry') {
+        stage('Deploy Application') {
             steps {
                 script {
-                    // Si tu as un registry privé ou Docker Hub
-                    // sh 'docker tag $DOCKER_IMAGE your-dockerhub-user/$DOCKER_IMAGE'
-                    // sh 'docker push your-dockerhub-user/$DOCKER_IMAGE'
-                    echo "Push to registry skipped for now"
-                }
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                script {
-                    // Déploiement simple via docker-compose
-                    sh 'docker-compose down'
-                    sh 'docker-compose up -d --build'
+                    docker.withRegistry("http://${NEXUS_URL}", NEXUS_CREDENTIAL_ID) {
+                        sh "docker pull ${NEXUS_URL}/smarthealth:latest"
+                        sh "docker-compose down"
+                        sh "docker-compose up -d --build"
+                    }
                 }
             }
         }
