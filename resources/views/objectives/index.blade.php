@@ -91,6 +91,15 @@
                 </div>
             </div>
         </div>
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Daily Motivation</h5>
+                <p class="card-description">Pull a fresh quote to kickstart your objectives.</p>
+                <div id="quote-card" class="border rounded p-3 bg-light mb-3" style="display:none"></div>
+                <div id="quote-empty" class="text-muted small">Tap the button below to retrieve today's motivation.</div>
+                <button id="quote-refresh" class="btn btn-outline-primary btn-sm">Show Today's Quote</button>
+            </div>
+        </div>
         <div class="card">
             <div class="card-body">
                 <h5 class="card-title">Weather-based Suggestions</h5>
@@ -278,6 +287,63 @@ document.addEventListener('DOMContentLoaded', function () {
     var weatherResult = document.getElementById('weather-result');
     var weatherEmpty = document.getElementById('weather-empty');
     var weatherError = document.getElementById('weather-city-error');
+
+    var quoteRefresh = document.getElementById('quote-refresh');
+    var quoteCard = document.getElementById('quote-card');
+    var quoteEmpty = document.getElementById('quote-empty');
+
+    if (quoteRefresh) {
+        var loadQuote = function () {
+            quoteRefresh.disabled = true;
+            quoteRefresh.textContent = 'Loading...';
+            quoteEmpty.style.display = 'none';
+            quoteCard.style.display = 'block';
+            quoteCard.innerHTML = '<div class="spinner-border spinner-border-sm text-primary mr-2" role="status"></div> Fetching your motivational quote...';
+
+            fetch('{{ route('motivation.quote') }}')
+                .then(function (response) {
+                    if (!response.ok) {
+                        throw response;
+                    }
+                    return response.json();
+                })
+                .then(function (payload) {
+                    if (!payload.success) {
+                        throw payload;
+                    }
+
+                    var quote = payload.data;
+                    quoteCard.innerHTML = `
+                        <blockquote class="mb-2">“${quote.quote}”</blockquote>
+                        <div class="text-right font-italic">— ${quote.author}</div>
+                    `;
+                })
+                .catch(function (error) {
+                    var message = 'Unable to load a quote right now. Try again later.';
+                    if (error && error.json) {
+                        error.json().then(function (payload) {
+                            message = payload.message || message;
+                            quoteCard.innerHTML = `<div class="text-danger">${message}</div>`;
+                        }).catch(function () {
+                            quoteCard.innerHTML = `<div class="text-danger">${message}</div>`;
+                        });
+                    } else {
+                        quoteCard.innerHTML = `<div class="text-danger">${message}</div>`;
+                    }
+                })
+                .finally(function () {
+                    quoteRefresh.disabled = false;
+                    quoteRefresh.textContent = 'Refresh Quote';
+                });
+        };
+
+        quoteRefresh.addEventListener('click', function () {
+            loadQuote();
+        });
+
+        // auto-load on page render to keep card populated
+        loadQuote();
+    }
 
     if (weatherForm) {
         weatherForm.addEventListener('submit', function (event) {

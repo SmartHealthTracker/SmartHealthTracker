@@ -12,6 +12,7 @@ use App\Http\Controllers\HabitController;
 use App\Http\Controllers\HabitTrackingController;
 use App\Http\Controllers\ObjectiveController;
 use App\Http\Controllers\WeatherSuggestionController;
+use App\Http\Controllers\MotivationQuoteController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\View;
 use App\Http\Controllers\NutritionController;
@@ -201,6 +202,9 @@ Route::get('/objectives/events', [ObjectiveController::class, 'events'])->name('
 
 // Weather suggestions API
 Route::get('/weather/suggestions', WeatherSuggestionController::class)->name('weather.suggestions');
+
+// Motivational quote API
+Route::get('/motivation/quote', MotivationQuoteController::class)->name('motivation.quote');
 
 // Habit Tracking Routes - FIXED AND CLEANED UP
 Route::post('/habit-trackings/{tracking}/update-progress', [HabitTrackingController::class, 'updateProgress'])->name('habit-trackings.update-progress');
