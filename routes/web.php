@@ -20,13 +20,14 @@ use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\ChallengeParticipationController;
 use App\Http\Controllers\ChatbotController;
-
+use App\Http\Controllers\HabitSaifController;
 // -------------------- DASHBOARD --------------------
 Route::get('/', function () {
     return view('dashboard');
 });
 
-// -------------------- CHALLENGE PARTICIPATION --------------------
+
+// -------------------- CHALLENGE Mahmoud PARTICIPATION --------------------
 Route::get('/cha-parti-dashboard', [ChallengeParticipationController::class, 'index'])
     ->name('cha-parti-dashboard');
 
@@ -40,6 +41,8 @@ Route::resource('challenges', ChallengeController::class);
 // Single Challenge view (after export-pdf)
 Route::get('/challenges/{challenge}', [ChallengeController::class, 'show'])
     ->name('challenges.show');
+// -------------------- CHALLENGE Mahmoud PARTICIPATION --------------------
+
 
 // -------------------- ACTIVITIES --------------------
 Route::resource('activities', ActivityController::class)
@@ -50,12 +53,13 @@ Route::resource('activity-logs', ActivityLogController::class)
     ->names('activity_logs')
     ->except('show');
 
-// -------------------- PARTICIPATIONS --------------------
+// -------------------- PARTICIPATIONS Mahmoud Controller --------------------
 Route::middleware(['auth'])->group(function () {
     Route::get('/participations', [ParticipationController::class, 'index'])->name('participations.index');
     Route::post('/participations', [ParticipationController::class, 'store'])->name('participations.store');
     Route::put('/participations/{participation}', [ParticipationController::class, 'update'])->name('participations.update');
     Route::delete('/participations/{participation}', [ParticipationController::class, 'destroy'])->name('participations.destroy');
+// -------------------- PARTICIPATIONS Mahmoud Controller --------------------
 
     // Admin users
     Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users.index');
@@ -71,8 +75,10 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
 Route::get('auth/google', [GoogleAuthController::class, 'redirectToGoogle'])->name('auth.google');
 Route::get('auth/google/callback', [GoogleAuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
 
-// -------------------- CHATBOT --------------------
+// -------------------- CHATBOT Mah --------------------
 Route::post('/chatbot/reply', [ChatbotController::class, 'reply'])->name('chatbot.reply');
+// -------------------- CHATBOT Mah --------------------
+
 
 // -------------------- HABITS --------------------
 Route::resource('habits', HabitController::class);
@@ -115,6 +121,22 @@ Route::group(['prefix' => 'user-pages'], function() {
     Route::post('password/reset', [ResetPasswordController::class, 'reset'])
         ->name('password.update');
 });
+
+// -------------------- HABIT SAIF CONTROLLER --------------------
+
+
+// Routes pour HabitLog
+// routes/web.php
+Route::resource('habit-logs', HabitLogController::class);
+Route::resource('habitssaif', HabitSaifController::class)->parameters([
+    'habitssaif' => 'habit'
+]);
+// Individual routes - use {habit} parameter
+Route::get('habitssaif/{habit}/edit', [HabitSaifController::class, 'edit'])->name('habitssaif.edit');
+Route::get('habitssaif/{habit}/download-report', [HabitSaifController::class, 'downloadReport'])->name('habitssaif.downloadReport');
+Route::get('/api/gemini-advice/{habit}', [HabitSaifController::class, 'fetchGeminiAdvice'])->name('api.gemini-advice');
+// -------------------- HABIT SAIF CONTROLLER --------------------
+
 
 // -------------------- CLEAR CACHE --------------------
 Route::get('/clear-cache', function() {
