@@ -21,6 +21,8 @@ use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\ChallengeParticipationController;
 use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\HabitSaifController;
+use App\Http\Controllers\ChallengeCalendarController;
+
 // -------------------- DASHBOARD --------------------
 Route::get('/', function () {
     return view('dashboard');
@@ -35,15 +37,19 @@ Route::get('/cha-parti-dashboard', [ChallengeParticipationController::class, 'in
 Route::get('/challenges/export-pdf', [ChallengeParticipationController::class, 'exportPdf'])
     ->name('challenges.exportPdf');
 
-// Resource routes for challenges
+// CALENDAR ROUTE - MOVED BEFORE RESOURCE ROUTES
+Route::get('/challenges/calendar', [ChallengeCalendarController::class, 'index'])->name('challenges.calendar');
+// Resource routes for challenges - THIS SHOULD COME AFTER SPECIFIC ROUTES
 Route::resource('challenges', ChallengeController::class);
 
 // Single Challenge view (after export-pdf)
 Route::get('/challenges/{challenge}', [ChallengeController::class, 'show'])
     ->name('challenges.show');
+
 // -------------------- CHALLENGE Mahmoud PARTICIPATION --------------------
 
 
+// Rest of your routes remain the same...
 // -------------------- ACTIVITIES --------------------
 Route::resource('activities', ActivityController::class)
     ->names('activities')

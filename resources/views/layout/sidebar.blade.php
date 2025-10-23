@@ -151,6 +151,9 @@
       <li class="nav-item {{ active_class(['user-pages/register']) }}">
         <a class="nav-link" href="{{ url('/challenges') }}">Challenge</a>
       </li>
+      <li class="nav-item {{ active_class(['user-pages/register']) }}">
+        <a class="nav-link" href="{{ url('/challenges/calendar') }}">Calendar</a>
+      </li>
     </ul>
   </div>
 </li>

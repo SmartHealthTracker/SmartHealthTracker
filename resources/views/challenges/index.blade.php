@@ -6,7 +6,7 @@
 <div class="row mt-4">
     <div class="col-md-12">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4>🗓️ Calendrier des Challenges</h4>
+            <h4>🗓️ Challenges</h4>
             <button class="btn btn-success btn-sm" id="addChallengeBtn">
                 <i class="mdi mdi-plus"></i> Ajouter un Challenge
             </button>
