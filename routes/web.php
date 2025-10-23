@@ -17,6 +17,7 @@ use App\Http\Controllers\HealthController;
 use App\Http\Controllers\UserControllerr;
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\ReportController;
 
 
 Route::get('/', function () {
@@ -29,6 +30,9 @@ Route::resource('activities', ActivityController::class)
 Route::resource('activity-logs', ActivityLogController::class)
     ->names('activity_logs')
     ->except('show');
+
+Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+Route::get('/reports/predictions', [ReportController::class, 'predictions'])->name('reports.predictions');    
 
 Route::resource('challenges', ChallengeController::class);
 Route::resource('participations', ParticipationController::class);
