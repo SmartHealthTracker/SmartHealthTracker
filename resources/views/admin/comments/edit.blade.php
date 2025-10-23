@@ -6,25 +6,12 @@
     <form action="{{ route('comments.update', $comment->id) }}" method="POST">
         @csrf
         @method('PUT')
-<<<<<<< HEAD
-=======
 
         {{-- Ressource --}}
->>>>>>> Ramez
         <div class="mb-3">
             <label for="resource_id" class="form-label">Ressource</label>
             <select name="resource_id" class="form-control" required>
                 @foreach($resources as $resource)
-<<<<<<< HEAD
-                    <option value="{{ $resource->id }}" @if($comment->resource_id == $resource->id) selected @endif>{{ $resource->title }}</option>
-                @endforeach
-            </select>
-        </div>
-        <div class="mb-3">
-            <label for="content" class="form-label">Contenu</label>
-            <textarea name="content" class="form-control" rows="3" required>{{ $comment->content }}</textarea>
-        </div>
-=======
                     <option value="{{ $resource->id }}" @if($comment->resource_id == $resource->id) selected @endif>
                         {{ $resource->title }}
                     </option>
@@ -36,40 +23,34 @@
         <div class="mb-3">
             <label for="content" class="form-label">Contenu</label>
             <textarea id="content" name="content" class="form-control" rows="3" required
-                      minlength="20" maxlength="500" 
-                      pattern=".{20,500}" 
-                      title="Le commentaire doit contenir entre 20 et 500 caractères">{{ $comment->content }}</textarea>
-            <small id="charCount" class="form-text text-muted">0 / 500 caractères</small>
+                      minlength="20" maxlength="500"
+                      pattern=".{20,500}"
+                      title="Le commentaire doit contenir entre 20 et 500 caracteres">{{ $comment->content }}</textarea>
+            <small id="charCount" class="form-text text-muted">0 / 500 caracteres</small>
         </div>
 
         {{-- Date --}}
->>>>>>> Ramez
         <div class="mb-3">
             <label for="date" class="form-label">Date</label>
             <input type="date" name="date" class="form-control" value="{{ $comment->date }}" required>
         </div>
-<<<<<<< HEAD
-        <button type="submit" class="btn btn-primary">Mettre à jour</button>
-    </form>
-</div>
-=======
 
-        <button type="submit" class="btn btn-primary">Mettre à jour</button>
+        <button type="submit" class="btn btn-primary">Mettre a jour</button>
     </form>
 </div>
 
-{{-- Compteur de caractères JS --}}
+{{-- Compteur de caracteres JS --}}
 <script>
     const textarea = document.getElementById('content');
     const charCount = document.getElementById('charCount');
 
-    // Initialiser le compteur au chargement
-    charCount.textContent = `${textarea.value.length} / 500 caractères`;
+    if (textarea && charCount) {
+        charCount.textContent = `${textarea.value.length} / 500 caracteres`;
 
-    textarea.addEventListener('input', () => {
-        const length = textarea.value.length;
-        charCount.textContent = `${length} / 500 caractères`;
-    });
+        textarea.addEventListener('input', () => {
+            const length = textarea.value.length;
+            charCount.textContent = `${length} / 500 caracteres`;
+        });
+    }
 </script>
->>>>>>> Ramez
 @endsection

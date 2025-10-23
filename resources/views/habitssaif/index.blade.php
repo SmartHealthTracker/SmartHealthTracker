@@ -360,16 +360,16 @@
             flex-direction: column;
             gap: 20px;
         }
-        
+
         .card-view {
             grid-template-columns: 1fr;
         }
-        
+
         .stats-info {
             flex-wrap: wrap;
             justify-content: center;
         }
-        
+
         .sport-title {
             font-size: 2rem;
         }
@@ -382,8 +382,13 @@
     <div class="sport-header">
         <h1 class="sport-title">🏆 Mes Habitudes Sportives</h1>
         <p class="sport-subtitle">Optimisez vos performances et suivez votre progression</p>
-    </div>
 
+    </div>
+<a href="{{ route('habitssaif.create') }}"
+   class="btn btn-primary"
+   title="Créer un nouvel habit">
+    <i class="fas fa-plus"></i> Créer
+</a>
     <div class="controls">
         <div class="mode-switch">
             <button class="mode-btn active" id="cardModeBtn">
@@ -420,7 +425,7 @@
                     'Basketball' => 'https://images.pexels.com/photos/1752757/pexels-photo-1752757.jpeg',
                     'Tennis' => 'https://images.pexels.com/photos/209977/pexels-photo-209977.jpeg',
                 ];
-                
+
                 $sportIcons = [
                     'Course' => '🏃',
                     'Musculation' => '💪',
@@ -432,7 +437,7 @@
                     'Basketball' => '🏀',
                     'Tennis' => '🎾',
                 ];
-                
+
                 $bg = $sportImages[$habit->title] ?? 'https://images.pexels.com/photos/1552242/pexels-photo-1552242.jpeg';
                 $icon = $sportIcons[$habit->title] ?? '🏆';
             @endphp
@@ -501,8 +506,8 @@
                 <td>{{ $habit->created_at->format('d/m/Y') }}</td>
                 <td>
    <td>
-    <a href="{{ route('habitssaif.show', $habit) }}" 
-       class="sport-btn btn-primary" 
+    <a href="{{ route('habitssaif.show', $habit) }}"
+       class="sport-btn btn-primary"
        style="padding: 6px 12px; font-size: 0.85rem;">
        <i class="fas fa-eye"></i> Voir Détails
     </a>
@@ -520,9 +525,9 @@
         @else
             <a href="{{ $habits->previousPageUrl() }}" class="page-number">⬅ Précédent</a>
         @endif
-        
+
         <span class="page-number active">{{ $habits->currentPage() }}</span>
-        
+
         @if($habits->hasMorePages())
             <a href="{{ $habits->nextPageUrl() }}" class="page-number">Suivant ➡</a>
         @else
@@ -536,7 +541,7 @@
         <div class="modal-content">
             <span class="modal-close" id="modalClose">&times;</span>
             <h2 class="modal-title" id="modalTitle"></h2>
-            
+
             <div class="modal-info">
                 <div class="info-item">
                     <span class="info-label">📝 Description:</span>
@@ -559,7 +564,7 @@
                     <span class="info-value" id="modalCreated"></span>
                 </div>
             </div>
-            
+
             <div class="modal-qr" id="modalQr"></div>
         </div>
     </div>
@@ -583,7 +588,7 @@ document.addEventListener('DOMContentLoaded', function() {
         cardBtn.classList.add('active');
         tableBtn.classList.remove('active');
     });
-    
+
     tableBtn.addEventListener('click', () => {
         cardView.style.display = 'none';
         tableView.style.display = 'table';
@@ -595,7 +600,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.sport-card').forEach(card => {
         card.addEventListener('click', () => {
             const { title, description, category, target, unit, user, created, icon } = card.dataset;
-            
+
             document.getElementById('modalTitle').textContent = `${icon} ${title}`;
             document.getElementById('modalDescription').textContent = description;
             document.getElementById('modalCategory').textContent = category;
@@ -611,22 +616,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 `👤 Utilisateur: ${user}\n` +
                 `📅 Créée le: ${created}`
             );
-            
+
             document.getElementById('modalQr').innerHTML = `
                 <p style="margin-bottom: 15px; color: #666; font-weight: 600;">QR Code de l'activité</p>
                 <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${qrData}&bgcolor=ffffff&color=00b0ff"
                      alt="QR Code"
                      style="border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.15); border: 2px solid #f0f0f0;">
             `;
-            
+
             modal.style.display = 'flex';
         });
     });
 
     // Fermeture du modal
     modalClose.addEventListener('click', () => modal.style.display = 'none');
-    window.addEventListener('click', (e) => { 
-        if (e.target === modal) modal.style.display = 'none'; 
+    window.addEventListener('click', (e) => {
+        if (e.target === modal) modal.style.display = 'none';
     });
 });
 </script>
