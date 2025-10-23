@@ -13,6 +13,9 @@ use App\Http\Controllers\ChallengeController;
 use App\Http\Controllers\ParticipationController;
 use App\Http\Controllers\HabitController;
 use App\Http\Controllers\HabitTrackingController;
+use App\Http\Controllers\ObjectiveController;
+use App\Http\Controllers\WeatherSuggestionController;
+use App\Http\Controllers\MotivationQuoteController;
 use App\Http\Controllers\NutritionController;
 use App\Http\Controllers\HealthController;
 use App\Http\Controllers\UserControllerr;
@@ -40,6 +43,14 @@ Route::get('/challenges/export-pdf', [ChallengeParticipationController::class, '
     ->name('challenges.exportPdf');
 
 // Resource routes for challenges
+Route::resource('activities', ActivityController::class)
+    ->names('activities')
+    ->except('show');
+
+Route::resource('activity-logs', ActivityLogController::class)
+    ->names('activity_logs')
+    ->except('show');
+
 Route::resource('challenges', ChallengeController::class);
 
 // Single Challenge view (after export-pdf)
@@ -109,7 +120,7 @@ Route::post('/workout', [WorkoutController::class, 'generate'])->name('workout.g
 
 
 Route::get('/', function () {
-    return Auth::check() 
+    return Auth::check()
         ? view('dashboard')   // si connecté => dashboard
         : redirect('/user-pages/login'); // sinon => login
 });
@@ -248,6 +259,10 @@ Route::group(['prefix' => 'user-pages'], function() {
     Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
     Route::post('login', [LoginController::class, 'login'])->name('login.post');
     Route::post('logout', [LoginController::class, 'logout'])->name('logout');
+    Route::get('deleteusers', [UserControllerr::class, 'index'])->name('users.index');
+    Route::delete('deleteusers/{user}', [UserControllerr::class, 'destroy'])->name('users.destroy');
+    Route::post('deleteusers/delete-all', [UserControllerr::class, 'deleteAll'])->name('users.deleteAll');
+    Route::patch('toggle-block/{user}', [UserControllerr::class, 'toggleBlock'])->name('users.toggleBlock');
 
     Route::get('login-2', function () { return view('pages.user-pages.login-2'); });
     Route::get('multi-step-login', function () { return view('pages.user-pages.multi-step-login'); });
@@ -273,8 +288,51 @@ Route::get('/clear-cache', function() {
     Artisan::call('cache:clear');
     return "Cache is cleared";
 });
+// Habits Routes
+Route::resource('habits', HabitController::class);
+Route::post('/habits/{habit}/start', [HabitController::class, 'start'])->name('habits.start');
+
+// Objectives Routes
+Route::get('/objectives', [ObjectiveController::class, 'index'])->name('objectives.index');
+Route::post('/objectives', [ObjectiveController::class, 'store'])->name('objectives.store');
+Route::patch('/objectives/{objective}', [ObjectiveController::class, 'update'])->name('objectives.update');
+Route::delete('/objectives/{objective}', [ObjectiveController::class, 'destroy'])->name('objectives.destroy');
+Route::get('/objectives/events', [ObjectiveController::class, 'events'])->name('objectives.events');
+
+// Weather suggestions API
+Route::get('/weather/suggestions', WeatherSuggestionController::class)->name('weather.suggestions');
+
+// Motivational quote API
+Route::get('/motivation/quote', MotivationQuoteController::class)->name('motivation.quote');
+
+// Habit Tracking Routes - FIXED AND CLEANED UP
+Route::post('/habit-trackings/{tracking}/update-progress', [HabitTrackingController::class, 'updateProgress'])->name('habit-trackings.update-progress');
+Route::post('/habit-trackings/{tracking}/finish', [HabitTrackingController::class, 'finish'])->name('habit-trackings.finish');
+Route::get('/habit-trackings/{tracking}', [HabitTrackingController::class, 'show'])->name('habit-trackings.show'); // ADD THIS
+
+// Remove these duplicate routes:
+// Route::post('/habit-trackings/{tracking}/update', [HabitTrackingController::class, 'updateProgress'])->name('habit.updateProgress');
+// Route::post('/habits/complete/{tracking}', [HabitController::class, 'complete'])->name('habits.complete');
+
+// Nutrition Route
+Route::post('/nutrition', [NutritionController::class, 'getNutrition'])->name('nutrition.get');
+
+// Health Routes
+Route::prefix('health')->middleware(['auth'])->group(function () {
+    Route::get('/', [HealthController::class, 'index'])->name('health.index');
+    Route::get('/logs', [HealthController::class, 'logs'])->name('health.logs');
+    Route::post('/', [HealthController::class, 'store'])->name('health.store');
+    Route::delete('/{healthLog}', [HealthController::class, 'destroy'])->name('health.destroy');
+});
 
 // -------------------- FALLBACK 404 --------------------
 Route::fallback(function () {
     return view('pages.error-pages.error-404');
 });
+// 404 for undefined routes
+Route::any('/{page?}',function(){
+    return View::make('pages.error-pages.error-404');
+})->where('page','.*');
+Route::any('/{page?}',function(){
+    return View::make('pages.error-pages.error-404');
+})->where('page','.*');

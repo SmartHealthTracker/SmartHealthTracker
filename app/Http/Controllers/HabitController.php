@@ -16,11 +16,11 @@ class HabitController extends Controller
     }
 
     protected $defaultIcons = [
-        'sleep'    => 'https://cdn-icons-png.flaticon.com/512/681/681494.png',
-        'sport'    => 'https://cdn-icons-png.flaticon.com/512/2917/2917251.png',
-        'study'    => 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
-        'reading'  => 'https://cdn-icons-png.flaticon.com/512/1055/1055646.png',
-        'nutrition'=> 'https://cdn-icons-png.flaticon.com/512/1046/1046784.png',
+        'sleep'    => 'https://www.flaticon.com/free-icon/sleep_10303407?term=sleep&page=1&position=4&origin=search&related_id=10303407',
+        'sport'    => 'https://www.flaticon.com/free-icon/sports_3311579?term=sport&page=1&position=3&origin=search&related_id=3311579',
+        'study'    => 'https://www.flaticon.com/free-icon/reading_8750754?term=study&page=1&position=1&origin=search&related_id=8750754',
+        'reading'  => 'https://www.flaticon.com/free-icon/reading-book_4072217?term=reading&page=1&position=1&origin=search&related_id=4072217',
+        'nutrition'=> 'https://www.flaticon.com/free-icon/nutrition-plan_9756984?term=nutrition&page=1&position=1&origin=search&related_id=9756984',
     ];
 
     public function index()
@@ -99,7 +99,7 @@ class HabitController extends Controller
         return redirect()->route('habits.index')->with('success', 'Habitude supprimée avec succès.');
     }
 
-    // Ajoutez cette méthode à la classe HabitController
+    // ✅ Démarrer une habitude
     public function start(Habit $habit)
     {
         $userId = Auth::id();
@@ -110,11 +110,18 @@ class HabitController extends Controller
             [
                 'progress' => 0,
                 'state' => $habit->duration ? 'in_progress' : 'not_started',
+<<<<<<< HEAD
                 'started_at' => now() // <-- Ajoutez cette ligne
             ]
         );
 
         // Si le tracking existait déjà mais n'avait pas started_at, on le met à jour
+=======
+                'started_at' => now()
+            ]
+        );
+
+>>>>>>> GestionDesHabitudes
         if ($tracking->started_at === null && $habit->duration) {
             $tracking->started_at = now();
             $tracking->save();
@@ -122,4 +129,37 @@ class HabitController extends Controller
 
         return response()->json(['tracking_id' => $tracking->id]);
     }
+<<<<<<< HEAD
+=======
+
+    // ✅ Terminer une habitude + Créer une notification
+    public function complete(HabitTracking $tracking)
+    {
+        $userId = Auth::id();
+
+        // Vérifie que le suivi appartient à l'utilisateur connecté
+        if ($tracking->user_id !== $userId) {
+            abort(403, 'Action non autorisée.');
+        }
+
+        // Marquer l'activité comme terminée
+        $tracking->update([
+            'state' => 'completed',
+            'progress' => 100,
+            'elapsed_minutes' => $tracking->elapsed_minutes ?? 0,
+        ]);
+
+        // ✅ Créer la notification
+        Notification::create([
+            'user_id' => $userId,
+            'habit_tracking_id' => $tracking->id,
+            'title' => 'Activité terminée 🎉',
+            'body' => 'Bravo ! Vous avez terminé votre habitude : ' . $tracking->habit->name,
+            'type' => 'success',
+            'read' => false,
+        ]);
+
+        return response()->json(['message' => 'Habitude terminée et notification envoyée.']);
+    }
+>>>>>>> GestionDesHabitudes
 }
