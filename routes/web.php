@@ -32,7 +32,10 @@ Route::resource('activity-logs', ActivityLogController::class)
     ->except('show');
 
 Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+Route::get('/reports/pdf', [ReportController::class, 'downloadPDF'])->name('reports.pdf');
 Route::get('/reports/predictions', [ReportController::class, 'predictions'])->name('reports.predictions');    
+
+
 
 Route::resource('challenges', ChallengeController::class);
 Route::resource('participations', ParticipationController::class);

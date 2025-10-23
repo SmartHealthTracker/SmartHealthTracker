@@ -5,8 +5,13 @@
 <div class="row">
     <div class="col-md-12 grid-margin">
         <div class="card">
-            <div class="p-4 border-bottom bg-light">
+            <div class="p-4 border-bottom bg-light d-flex justify-content-between align-items-center">
                 <h4 class="card-title mb-0">Rapports d'Activités</h4>
+                <!-- 🔽 Bouton de téléchargement PDF -->
+                <a href="{{ route('reports.pdf', ['period' => $period, 'start_date' => $startDate, 'end_date' => $endDate]) }}"
+                   class="btn btn-danger">
+                    <i class="mdi mdi-file-pdf"></i> Télécharger PDF
+                </a>
             </div>
             <div class="card-body">
                 <!-- Formulaire de filtres -->
@@ -49,11 +54,10 @@
                     </div>
                 </div>
 
-                <!-- Graphique Mixed : Barres pour Calories et Ligne pour Heures -->
                 @if ($repartition->isNotEmpty())
                 <canvas id="combinedChart" height="100"></canvas>
                 @else
-                <p class="text-center text-muted">Aucune répartition disponible (pas d'activités enregistrées pour cette période).</p>
+                <p class="text-center text-muted">Aucune répartition disponible pour cette période.</p>
                 @endif
             </div>
         </div>
@@ -67,57 +71,38 @@
 
 @push('custom-scripts')
 <script>
-    @if ($repartition->isNotEmpty())
-    const ctx = document.getElementById('combinedChart').getContext('2d');
-    const combinedChart = new Chart(ctx, {
-        data: {
-            labels: {!! json_encode($chartLabels) !!},
-            datasets: [
-                {
-                    type: 'bar',
-                    label: 'Calories Brûlées',
-                    data: {!! json_encode($chartData) !!},
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1
-                },
-                {
-                    type: 'line',
-                    label: 'Heures',
-                    data: {!! json_encode($chartDataHours) !!},
-                    backgroundColor: 'rgba(255, 159, 64, 0.2)',
-                    borderColor: 'rgba(255, 159, 64, 1)',
-                    borderWidth: 1,
-                    fill: false
-                }
-            ]
-        },
-        options: {
-            plugins: {
-                legend: {
-                    display: true,
-                }
+@if ($repartition->isNotEmpty())
+const ctx = document.getElementById('combinedChart').getContext('2d');
+const combinedChart = new Chart(ctx, {
+    data: {
+        labels: {!! json_encode($chartLabels) !!},
+        datasets: [
+            {
+                type: 'bar',
+                label: 'Calories Brûlées',
+                data: {!! json_encode($chartData) !!},
+                backgroundColor: 'rgba(75, 192, 192, 0.4)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
             },
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
+            {
+                type: 'line',
+                label: 'Heures',
+                data: {!! json_encode($chartDataHours) !!},
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 2,
+                fill: false
             }
-        }
-    });
-    @endif
-</script>
-{{-- Message succès --}}
-@if (session('success'))
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-  Swal.fire({
-    icon: 'success',
-    title: 'Succès',
-    text: '{{ session('success') }}',
-    timer: 2500,
-    showConfirmButton: false
-  });
-</script>
+        ]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { display: true }
+        },
+        scales: { y: { beginAtZero: true } }
+    }
+});
 @endif
+</script>
 @endpush

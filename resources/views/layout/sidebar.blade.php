@@ -204,6 +204,7 @@
           <li class="nav-item {{ active_class(['activities']) }}">
             <a class="nav-link" href="{{ route('activities.index') }}">Activities</a>
           </li>
+          
         </ul>
       </div>
     </li>  
