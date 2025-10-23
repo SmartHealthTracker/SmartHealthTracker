@@ -16,11 +16,10 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'GestionEvent', 
-                    url: 'https://github.com/SmartHealthTracker/SmartHealthTracker.git', 
-                    credentialsId: 'github_token'
+                git branch: 'GestionEvent', url: 'https://github.com/SmartHealthTracker/SmartHealthTracker.git'
             }
-        }
+    }
+
 
         stage('Install dependencies') {
             steps {
