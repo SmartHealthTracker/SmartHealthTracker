@@ -51,11 +51,17 @@ pipeline {
                 script {
                     def scannerHome = tool 'jenkinsSonar'
                     withSonarQubeEnv('SonarQube') {
-                        sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=${APP_NAME} -Dsonar.sources=."
+                        sh """
+                        ${scannerHome}/bin/sonar-scanner \
+                        -Dsonar.projectKey=${APP_NAME} \
+                        -Dsonar.sources=. \
+                        -Dsonar.exclusions=public/assets/plugins/**/*.js
+                        """
                     }
                 }
             }
         }
+
 
         stage('Build Docker Image') {
             steps {
