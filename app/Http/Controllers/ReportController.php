@@ -10,7 +10,7 @@ use Carbon\Carbon;
 
 class ReportController extends Controller
 {
-    // Rapports personnalisés
+    // Rapports personnalisés (inchangé)
     public function index(Request $request)
     {
         $userId = Auth::id(); // Utilisateur connecté (adaptez si multi-utilisateurs)
@@ -54,57 +54,114 @@ class ReportController extends Controller
         ));
     }
 
-    // Prédictions basées sur tendances
+    // Prédictions basées sur tendances (modifié pour valeurs variables)
     public function predictions()
     {
         $userId = Auth::id();
-
-        // Calculs simples : Moyenne sur 4 dernières semaines
         $now = Carbon::now();
-        $fourWeeksAgo = $now->copy()->subWeeks(4);
 
+        // Récupérer les logs historiques (jusqu'à 1 an en arrière pour plus de données)
+        $oneYearAgo = $now->copy()->subYear();
         $historicalLogs = ActivityLog::where('user_id', $userId)
-            ->where('date', '>=', $fourWeeksAgo)
+            ->where('date', '>=', $oneYearAgo)
+            ->orderBy('date')
             ->get();
 
-        $weeklyAverages = [];
-        for ($i = 0; $i < 4; $i++) {
-            $weekStart = $fourWeeksAgo->copy()->addWeeks($i)->startOfWeek();
-            $weekEnd = $weekStart->copy()->endOfWeek();
-            $weeklyCalories = $historicalLogs->whereBetween('date', [$weekStart, $weekEnd])->sum('calories_burned');
-            $weeklyAverages[] = $weeklyCalories;
+        // Grouper par semaine pour obtenir les calories hebdomadaires
+        $groupedByWeek = $historicalLogs->groupBy(function ($log) {
+            return Carbon::parse($log->date)->startOfWeek()->format('Y-m-d');
+        });
+
+        $weeklyCalories = $groupedByWeek->map(function ($group) {
+            return $group->sum('calories_burned');
+        })->sortKeys();
+
+        $weeks = $weeklyCalories->keys();
+        $numWeeks = $weeklyCalories->count();
+
+        // Fallback logique si peu de données (enlever constantes basses comme 2)
+        if ($numWeeks < 2) {
+            $averageCalories = $numWeeks > 0 ? max(2500, $weeklyCalories->average()) : 2500; // Valeur minimale logique
+            $m = 10; // Légère hausse pour variabilité
+            $b = $averageCalories;
+        } else {
+            // Calcul de régression linéaire simple
+            $x = range(1, $numWeeks);
+            $y = $weeklyCalories->values()->toArray();
+
+            $sum_x = array_sum($x);
+            $sum_y = array_sum($y);
+            $sum_xy = 0;
+            $sum_x2 = 0;
+
+            foreach ($x as $i => $xi) {
+                $sum_xy += $xi * $y[$i];
+                $sum_x2 += $xi * $xi;
+            }
+
+            $n = $numWeeks;
+            $denom = ($n * $sum_x2) - ($sum_x * $sum_x);
+
+            if ($denom == 0) {
+                $m = 10; // Minimum pour variabilité
+                $b = $sum_y / $n;
+            } else {
+                $m = (($n * $sum_xy) - ($sum_x * $sum_y)) / $denom;
+                $b = ($sum_y - ($m * $sum_x)) / $n;
+            }
         }
 
-        $averageCalories = count($weeklyAverages) > 0 ? array_sum($weeklyAverages) / count($weeklyAverages) : 0;
+        // Prédire pour les 12 prochaines semaines (3 mois)
+        $futurePredictions = [];
+        $predictedWeek = 0;
+        $predictedMonth = 0; // Prochain mois (~4 semaines)
+        $predicted3Months = 0; // Prochains 3 mois (~12 semaines)
 
-        // Prédiction pour la semaine suivante (simple : même que la moyenne)
-        $predictedCalories = round($averageCalories);
+        for ($i = 1; $i <= 12; $i++) {
+            $predicted = max(500, round($m * ($numWeeks + $i) + $b)); // Min 500 pour logique, arrondi
+            $futurePredictions[$i] = $predicted;
 
-        // Détection de baisse : Si la dernière semaine < moyenne - 20%
-        $lastWeekCalories = end($weeklyAverages);
-        $trendAlert = ($lastWeekCalories < $averageCalories * 0.8) ? 'Baisse d\'activité détectée : Moins de 3 logs ou calories en baisse.' : 'Tendance stable.';
+            // Cumuler pour les périodes
+            if ($i == 1) {
+                $predictedWeek = $predicted;
+            }
+            if ($i <= 4) {
+                $predictedMonth += $predicted;
+            }
+            $predicted3Months += $predicted;
 
-        // Stocker la prédiction
-        $nextWeekStart = $now->addWeek()->startOfWeek();
-        $nextWeekEnd = $nextWeekStart->copy()->endOfWeek();
-        Prediction::updateOrCreate(
-            ['user_id' => $userId, 'period_start' => $nextWeekStart],
-            [
-                'predicted_calories' => $predictedCalories,
-                'trend_alert' => $trendAlert,
-                'period_end' => $nextWeekEnd,
-            ]
-        );
+            // Déterminer l'alerte de tendance basée sur la pente (m)
+            $trendAlert = ($m < -10) ? 'Baisse d\'activité détectée.' : (($m > 10) ? 'Hausse d\'activité détectée.' : 'Tendance stable.');
 
-        // Récupérer les prédictions stockées
-        $predictions = Prediction::where('user_id', $userId)->latest()->get();
+            // Stocker la prédiction hebdomadaire
+            $weekStart = $now->copy()->addWeeks($i)->startOfWeek();
+            $weekEnd = $weekStart->copy()->endOfWeek();
+            Prediction::updateOrCreate(
+                ['user_id' => $userId, 'period_start' => $weekStart],
+                [
+                    'predicted_calories' => $predicted,
+                    'trend_alert' => $trendAlert,
+                    'period_end' => $weekEnd,
+                ]
+            );
+        }
 
-        // Données pour le graphique des prédictions
+        // Récupérer toutes les prédictions futures pour le graphique
+        $predictions = Prediction::where('user_id', $userId)
+            ->where('period_start', '>', $now)
+            ->orderBy('period_start')
+            ->get();
+
+        // Données pour le graphique : Évolution hebdomadaire des prédictions
         $chartLabelsPred = $predictions->pluck('period_start')->map(function ($date) {
-            return \Carbon\Carbon::parse($date)->format('d/m/Y');
+            return Carbon::parse($date)->format('d/m/Y');
         });
         $chartDataPred = $predictions->pluck('predicted_calories');
 
-        return view('pages.reports.predictions', compact('predictedCalories', 'trendAlert', 'predictions', 'chartLabelsPred', 'chartDataPred'));
+        // Passer les prédictions agrégées à la vue
+        return view('pages.reports.predictions', compact(
+            'predictedWeek', 'predictedMonth', 'predicted3Months', 'trendAlert',
+            'predictions', 'chartLabelsPred', 'chartDataPred'
+        ));
     }
 }

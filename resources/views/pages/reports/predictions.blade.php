@@ -9,20 +9,30 @@
                 <h4 class="card-title mb-0">Prédictions Basées sur Vos Tendances</h4>
             </div>
             <div class="card-body">
-                <h5>Prédiction pour la semaine prochaine</h5>
+                <h5>Prédictions pour les périodes futures</h5>
                 <div class="row">
                     <div class="col-md-4">
-                        <h2 class="mb-0 font-weight-medium">{{ $predictedCalories }}</h2>
-                        <p class="mb-5 text-muted">Calories brûlées estimées</p>
+                        <h2 class="mb-0 font-weight-medium">{{ $predictedWeek }}</h2>
+                        <p class="mb-5 text-muted">Semaine prochaine (calories estimées)</p>
                     </div>
-                    <div class="col-md-8">
-                        <h2 class="mb-0 font-weight-medium">{{ $trendAlert }}</h2>
-                        <p class="mb-5 text-muted">Alerte tendance</p>
+                    <div class="col-md-4">
+                        <h2 class="mb-0 font-weight-medium">{{ $predictedMonth }}</h2>
+                        <p class="mb-5 text-muted">Mois prochain (calories estimées)</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h2 class="mb-0 font-weight-medium">{{ $predicted3Months }}</h2>
+                        <p class="mb-5 text-muted">3 mois prochains (calories estimées)</p>
                     </div>
                 </div>
+                <p>Alerte tendance : {{ $trendAlert }}</p>
 
-                <!-- Graphique Ligne pour Prédictions -->
+                <!-- Graphique Ligne pour Prédictions (évolution hebdomadaire sur 12 semaines) -->
+                @if ($predictions->isNotEmpty())
+                <h6>Évolution des Calories Prédites (hebdomadaire)</h6>
                 <canvas id="predictionsChart" height="100"></canvas>
+                @else
+                <p class="text-center text-muted">Aucune prédiction disponible (ajoutez plus de logs d'activité pour améliorer les estimations).</p>
+                @endif
             </div>
         </div>
     </div>
@@ -35,6 +45,7 @@
 
 @push('custom-scripts')
 <script>
+    @if ($predictions->isNotEmpty())
     const predCtx = document.getElementById('predictionsChart').getContext('2d');
     const predictionsChart = new Chart(predCtx, {
         type: 'line',
@@ -62,6 +73,7 @@
             }
         }
     });
+    @endif
 </script>
 {{-- SweetAlert2 pour alertes --}}
 @if ($trendAlert && str_contains($trendAlert, 'Baisse'))
