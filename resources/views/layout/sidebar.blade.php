@@ -83,6 +83,9 @@
             <li class="nav-item {{ active_class(['habits']) }}">
                 <a class="nav-link" href="{{ route('habits.index') }}">Liste des Habits</a>
             </li>
+            <li class="nav-item {{ active_class(['objectives*']) }}">
+                <a class="nav-link" href="{{ route('objectives.index') }}">Objectives Calendar</a>
+            </li>
             <li class="nav-item {{ active_class(['habits/create']) }}">
                 <a class="nav-link" href="{{ route('habits.create') }}">Ajouter un Habit</a>
             </li>
@@ -105,6 +108,7 @@
           <span class="menu-title">Challenges</span>
       </a>
     </li>
+
     <li class="nav-item {{ active_class(['/admin/resources']) }}">
       <a class="nav-link" href="{{ url('/admin/resources') }}">
           <i class="menu-icon mdi mdi-account-multiple"></i>
@@ -119,26 +123,23 @@
     </li>
 
 
-    <li class="nav-item {{ active_class(['basic-ui/*']) }}">
-      <a class="nav-link" data-toggle="collapse" href="#basic-ui" aria-expanded="{{ is_active_route(['basic-ui/*']) }}" aria-controls="basic-ui">
-        <i class="menu-icon mdi mdi-dna"></i>
-        <span class="menu-title">Basic UI Elements</span>
-        <i class="menu-arrow"></i>
-      </a>
-      <div class="collapse {{ show_class(['basic-ui/*']) }}" id="basic-ui">
-        <ul class="nav flex-column sub-menu">
-          <li class="nav-item {{ active_class(['basic-ui/buttons']) }}">
-            <a class="nav-link" href="{{ url('/basic-ui/buttons') }}">Buttons</a>
-          </li>
-          <li class="nav-item {{ active_class(['basic-ui/dropdowns']) }}">
-            <a class="nav-link" href="{{ url('/basic-ui/dropdowns') }}">Dropdowns</a>
-          </li>
-          <li class="nav-item {{ active_class(['basic-ui/typography']) }}">
-            <a class="nav-link" href="{{ url('/basic-ui/typography') }}">Typography</a>
-          </li>
-        </ul>
-      </div>
-    </li>
+   <li class="nav-item {{ active_class(['basic-ui/*']) }}">
+  <a class="nav-link" data-toggle="collapse" href="#basic-ui" aria-expanded="{{ is_active_route(['basic-ui/*']) }}" aria-controls="basic-ui">
+    <i class="menu-icon mdi mdi-dna"></i>
+    <span class="menu-title">Habit Objectif</span>
+    <i class="menu-arrow"></i>
+  </a>
+  <div class="collapse {{ show_class(['basic-ui/*']) }}" id="basic-ui">
+    <ul class="nav flex-column sub-menu">
+      <li class="nav-item {{ active_class(['habitssaif']) }}">
+        <a class="nav-link" href="{{ url('/habitssaif') }}">Objectifs</a>
+      </li>
+      <li class="nav-item {{ active_class(['habit-logs']) }}">
+        <a class="nav-link" href="{{ url('/habit-logs') }}">Logs</a>
+      </li>
+    </ul>
+  </div>
+</li>
 
     <li class="nav-item {{ active_class(['charts/chartjs']) }}">
       <a class="nav-link" href="{{ url('/charts/chartjs') }}">
@@ -161,10 +162,16 @@
   <div class="collapse {{ show_class(['user-pages/*']) }}" id="user-pages">
     <ul class="nav flex-column sub-menu">
       <li class="nav-item {{ active_class(['user-pages/login']) }}">
+        <a class="nav-link" href="{{ url('/cha-parti-dashboard') }}">OverView</a>
+      </li>
+      <li class="nav-item {{ active_class(['user-pages/login']) }}">
         <a class="nav-link" href="{{ url('/participations') }}">Participation</a>
       </li>
       <li class="nav-item {{ active_class(['user-pages/register']) }}">
         <a class="nav-link" href="{{ url('/challenges') }}">Challenge</a>
+      </li>
+      <li class="nav-item {{ active_class(['user-pages/register']) }}">
+        <a class="nav-link" href="{{ url('/challenges/calendar') }}">Calendar</a>
       </li>
     </ul>
   </div>
@@ -215,7 +222,7 @@
 
         </ul>
       </div>
-    </li>  
+    </li>
     <li class="nav-item {{ active_class(['activity-logs/*']) }}">
   <a class="nav-link" data-toggle="collapse" href="#activity-logs" aria-expanded="{{ is_active_route(['activity-logs/*']) }}" aria-controls="activity-logs">
     <i class="menu-icon mdi mdi-notebook"></i>

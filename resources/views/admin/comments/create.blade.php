@@ -15,7 +15,7 @@
         </div>
         <div class="mb-3">
             <label for="content" class="form-label">Contenu</label>
-            <textarea name="content" class="form-control" rows="3" required></textarea>
+            <textarea name="content" class="form-control" rows="3" required minlength="20" maxlength="500"></textarea>
         </div>
         <div class="mb-3">
             <label for="date" class="form-label">Date</label>

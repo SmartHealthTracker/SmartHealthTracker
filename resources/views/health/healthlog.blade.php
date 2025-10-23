@@ -16,46 +16,56 @@
           @csrf
           <div class="row">
             <div class="col-md-2">
-              <input type="number" name="water" class="form-control" placeholder="Eau (ml)" value="{{ old('water') }}">
+              <input type="number" name="water" class="form-control @error('water') is-invalid @enderror" placeholder="Eau (ml)" value="{{ old('water') }}" min="0" max="10000" required>
+              @error('water')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
             <div class="col-md-2">
-              <input type="number" step="0.1" name="weight" class="form-control" placeholder="Poids (kg)" value="{{ old('weight') }}">
+              <input type="number" step="0.1" name="weight" class="form-control @error('weight') is-invalid @enderror" placeholder="Poids (kg)" value="{{ old('weight') }}" min="0.1" max="250" required>
+              @error('weight')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
             <div class="col-md-2">
-              <input type="number" step="0.1" name="height" class="form-control" placeholder="Taille (cm)" value="{{ old('height') }}">
+              <input type="number" step="0.1" name="height" class="form-control @error('height') is-invalid @enderror" placeholder="Taille (cm)" value="{{ old('height') }}" min="30" max="230" required>
+              @error('height')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
             <div class="col-md-2">
-              <input type="number" name="steps" class="form-control" placeholder="Pas" value="{{ old('steps') }}">
+              <input type="number" name="steps" class="form-control @error('steps') is-invalid @enderror" placeholder="Pas" value="{{ old('steps') }}" min="0" max="50000" required>
+              @error('steps')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
             <div class="col-md-2">
-              <input type="text" name="food_name" class="form-control" placeholder="Aliment" value="{{ old('food_name') }}">
+              <input type="text" name="food_name" class="form-control @error('food_name') is-invalid @enderror" placeholder="Aliment" value="{{ old('food_name') }}" required>
+              @error('food_name')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
             <div class="col-md-1">
-              <input type="number" name="calories" class="form-control" placeholder="Cal" value="{{ old('calories') }}">
+              <input type="number" name="calories" class="form-control @error('calories') is-invalid @enderror" placeholder="Cal" value="{{ old('calories') }}" min="0" required>
+              @error('calories')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
             <div class="col-md-1">
-              <input type="number" name="protein" class="form-control" placeholder="Prot" value="{{ old('protein') }}">
+              <input type="number" name="protein" class="form-control @error('protein') is-invalid @enderror" placeholder="Prot" value="{{ old('protein') }}" min="0" required>
+              @error('protein')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
             <div class="col-md-1">
-              <input type="number" name="carbs" class="form-control" placeholder="Carb" value="{{ old('carbs') }}">
+              <input type="number" name="carbs" class="form-control @error('carbs') is-invalid @enderror" placeholder="Carb" value="{{ old('carbs') }}" min="0" required>
+              @error('carbs')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
             <div class="col-md-1">
-              <input type="number" name="fat" class="form-control" placeholder="Fat" value="{{ old('fat') }}">
+              <input type="number" name="fat" class="form-control @error('fat') is-invalid @enderror" placeholder="Fat" value="{{ old('fat') }}" min="0" required>
+              @error('fat')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
           </div>
-
           <div class="row mt-2">
             <div class="col-md-2">
-              <input type="number" name="sleep_hours" class="form-control" placeholder="Sommeil (h)" value="{{ old('sleep_hours') }}">
+              <input type="number" name="sleep_hours" class="form-control @error('sleep_hours') is-invalid @enderror" placeholder="Sommeil (h)" value="{{ old('sleep_hours') }}" min="0" max="24" required>
+              @error('sleep_hours')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
             <div class="col-md-2">
-              <input type="number" name="heart_rate" class="form-control" placeholder="FC (bpm)" value="{{ old('heart_rate') }}">
+              <input type="number" name="heart_rate" class="form-control @error('heart_rate') is-invalid @enderror" placeholder="FC (bpm)" value="{{ old('heart_rate') }}" min="30" max="220" required>
+              @error('heart_rate')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
             <div class="col-md-2">
-              <input type="text" name="blood_pressure" class="form-control" placeholder="TA (120/80)" value="{{ old('blood_pressure') }}">
+              <input type="text" name="blood_pressure" class="form-control @error('blood_pressure') is-invalid @enderror" placeholder="TA (120/80)" value="{{ old('blood_pressure') }}" required>
+              @error('blood_pressure')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>
           </div>
-
           <button type="submit" class="btn btn-primary mt-2">Ajouter</button>
         </form>
       </div>

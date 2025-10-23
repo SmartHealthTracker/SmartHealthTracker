@@ -6,26 +6,21 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-   
-    public function up()
-{
-    Schema::create('comments', function (Blueprint $table) {
-        $table->id();
-        $table->unsignedBigInteger('resource_id');
-        $table->unsignedBigInteger('user_id'); 
-        $table->text('content');
-        $table->timestamp('date')->useCurrent();
-        $table->timestamps();
-
-        $table->foreign('resource_id')->references('id')->on('resources')->onDelete('cascade');
-        $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-    });
-}
-
-
+    public function up(): void
+    {
+        Schema::create('comments', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('resource_id')->constrained('resources')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->text('content');
+            $table->date('date')->nullable();
+            $table->timestamps();
+        });
+    }
 
     public function down(): void
     {
         Schema::dropIfExists('comments');
     }
 };
+

@@ -17,7 +17,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'email', 'password','role',
     ];
 
     /**
@@ -38,8 +38,17 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    public function resourcesViewed()
+    {
+    return $this->hasMany(UserResource::class);
+    }
     public function healthLogs()
     {
         return $this->hasMany(\App\Models\HealthLog::class, 'user_id', 'id');
+    }
+
+    public function objectives()
+    {
+        return $this->hasMany(Objective::class);
     }
 }
