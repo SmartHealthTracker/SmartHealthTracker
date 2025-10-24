@@ -4,7 +4,7 @@ pipeline {
     environment {
         APP_NAME = "smarthealth"
         DOCKER_IMAGE = "smarthealth:latest"
-        NEXUS_URL = '192.168.33.10:8081'
+        NEXUS_URL = '192.168.33.10:8084'
         NEXUS_REPO = 'SH' 
         NEXUS_CREDENTIAL_ID = "nexus"
     }
