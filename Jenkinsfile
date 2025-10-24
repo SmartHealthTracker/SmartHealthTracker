@@ -84,14 +84,14 @@ pipeline {
         stage('Deploy Application') {
             steps {
                 script {
-                    docker.withRegistry("http://${NEXUS_URL}", NEXUS_CREDENTIAL_ID) {
-                        sh "docker pull ${NEXUS_URL}/${NEXUS_REPO}:latest"
-                        sh "docker-compose down"
-                        sh "docker-compose up -d --build"
-                    }
+                    sh 'docker rm -f laravel_app mysql_db || true'
+
+                    sh 'docker-compose down || true'
+                    sh 'docker-compose up -d --build'
                 }
             }
         }
+
     }
 
     post {
