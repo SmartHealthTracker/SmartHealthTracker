@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
@@ -37,8 +37,29 @@ use App\Http\Controllers\ReportController;
 
 
 Route::get('/', function () {
-    return view('home.blade.php');
-});
+    $resources = Resource::with('comments')->latest()->limit(6)->get();
+
+    $recommendedResources = collect();
+
+    if (Auth::check()) {
+        $currentUserId = Auth::id();
+        $seenIds = \DB::table('user_resources')
+            ->where('user_id', $currentUserId)
+            ->pluck('resource_id')
+            ->toArray();
+
+        $recommendedResources = Resource::whereNotIn('id', $seenIds)
+            ->latest()
+            ->limit(8)
+            ->get();
+
+        if ($recommendedResources->isEmpty()) {
+            $recommendedResources = Resource::latest()->limit(8)->get();
+        }
+    }
+
+    return view('home', compact('resources', 'recommendedResources'));
+})->name('home');
 
 
 // -------------------- CHALLENGE Mahmoud PARTICIPATION --------------------
@@ -107,44 +128,17 @@ Route::middleware(['auth'])->group(function () {
 Route::post('/admin/resources/{resource}/comment', [ResourceController::class, 'comment'])->name('resources.comment');
 
 Route::get('/home', function () {
-    $resources = Resource::with('comments')->orderBy('created_at', 'desc')->get();
-
-    $recommendedResources = collect();
-
-    if(Auth::check()) {
-        $currentUserId = Auth::id();
-
-        $seenIds = \DB::table('user_resources')
-                      ->where('user_id', $currentUserId)
-                      ->pluck('resource_id')
-                      ->toArray();
-
-        $recommendedResources = Resource::whereNotIn('id', $seenIds)
-                                        ->limit(5)
-                                        ->get();
-
-        if ($recommendedResources->isEmpty()) {
-            $recommendedResources = Resource::latest()->limit(5)->get();
-        }
-    }
-
-    return view('home', compact('resources', 'recommendedResources'));
+    return redirect()->route('home');
 });
 
 
 Route::get('/workout', function(){
-    return view('workout.form'); // formulaire pour choisir objectif et préférences
+    return view('workout.form'); // formulaire pour choisir objectif et prÃ©fÃ©rences
 });
 
 Route::post('/workout', [WorkoutController::class, 'generate'])->name('workout.generate');
 
 
-
-Route::get('/', function () {
-    return Auth::check()
-        ? view('dashboard')   // si connecté => dashboard
-        : redirect('/user-pages/login'); // sinon => login
-});
 
 Route::resource('challenges', ChallengeController::class);
 
@@ -195,7 +189,7 @@ Route::middleware(['auth'])->group(function () {
 
 
 
-     // 🔹 Nouvelle route pour enregistrer une vue de ressource
+     // ðŸ”¹ Nouvelle route pour enregistrer une vue de ressource
     Route::post('/resource/view/{resource}', [App\Http\Controllers\Admin\ResourceController::class, 'recordView'])
         ->name('resources.recordView');
 });
@@ -292,10 +286,10 @@ Route::group(['prefix' => 'user-pages'], function() {
     Route::get('register-2', function () { return view('pages.user-pages.register-2'); });
     Route::get('lock-screen', function () { return view('pages.user-pages.lock-screen'); });
 
-    Route::get('register', [RegisterController::class, 'showRegistrationForm']);
+    Route::get('register', [RegisterController::class, 'showRegistrationForm'])->name('register.form');
     Route::post('register', [RegisterController::class, 'register'])->name('register');
 
-     // 🔹 Ajouter ces routes pour Forgot Password
+     // ðŸ”¹ Ajouter ces routes pour Forgot Password
     Route::get('password/forgot', [ForgotPasswordController::class, 'showLinkRequestForm'])
         ->name('password.request');
     Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])
@@ -376,3 +370,4 @@ Route::any('/{page?}',function(){
 Route::any('/{page?}',function(){
     return View::make('pages.error-pages.error-404');
 })->where('page','.*');
+
