@@ -211,6 +211,15 @@
           <li class="nav-item {{ active_class(['activities']) }}">
             <a class="nav-link" href="{{ route('activities.index') }}">Activities</a>
           </li>
+         <li class="nav-item {{ active_class(['chatbot-page']) }}">
+    <a class="nav-link" href="{{ route('chatbot.index') }}">
+        <i class="menu-icon mdi mdi-robot"></i>
+        <span class="menu-title">Chatbot</span>
+    </a>
+</li>
+
+
+
         </ul>
       </div>
     </li>
@@ -227,6 +236,8 @@
       </li>
     </ul>
   </div>
+  <div>
+</div>
 </li>
     <li class="nav-item">
       <a class="nav-link" href="https://www.bootstrapdash.com/demo/star-laravel-free/documentation/documentation.html" target="_blank">

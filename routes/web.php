@@ -31,6 +31,9 @@ use App\Models\Resource;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\WorkoutController;
 use App\Http\Controllers\HabitLogController;
+use App\Http\Controllers\ReportController;
+
+
 
 
 Route::get('/', function () {
@@ -57,6 +60,12 @@ Route::resource('activities', ActivityController::class)
 Route::resource('activity-logs', ActivityLogController::class)
     ->names('activity_logs')
     ->except('show');
+
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+Route::get('/reports/pdf', [ReportController::class, 'downloadPDF'])->name('reports.pdf');
+Route::get('/reports/predictions', [ReportController::class, 'predictions'])->name('reports.predictions');  
+Route::get('/chatbot', [ChatbotController::class, 'getResponse'])->name('chatbot.response');
+Route::get('/chatbot-page', [ChatbotController::class, 'index'])->name('chatbot.index');
 
 Route::resource('challenges', ChallengeController::class);
 
